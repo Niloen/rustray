@@ -15,7 +15,7 @@ fn main() {
     world.add(Sphere::new(Vector3::new(20.0, 0.5, 200.0), 50.0, Rgb([0.0, 1.0, 0.0])));
 
     let camera_base = Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.1, 1.0).normalize());
-    let camera = Camera::new(camera_base, 640, 480, 50.0);
+    let camera = Camera::new(camera_base, 3800, 1920, 50.0);
 
     let image = camera.take_photo(&world);
     
