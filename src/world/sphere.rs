@@ -2,7 +2,16 @@ use crate::vector::Vector3;
 use crate::world::object::{HitResult, Object};
 use crate::world::ray::Ray;
 
-impl Object for &Sphere {
+impl Sphere {
+    pub fn new(center: Vector3, radius: f64) -> Sphere {
+        Sphere {
+            center,
+            radius,
+        }
+    }
+}
+
+impl Object for Sphere {
     fn hit(&self, ray: &Ray) -> Option<HitResult> {
         let L = self.center - ray.origin;
         let tca = L.dot(ray.direction);
@@ -33,7 +42,8 @@ impl Object for &Sphere {
     }
 }
 
-struct Sphere {
+#[derive(Debug)]
+pub struct Sphere {
     center: Vector3,
     radius: f64,
 }

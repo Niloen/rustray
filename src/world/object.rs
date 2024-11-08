@@ -1,5 +1,6 @@
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
+#[derive(Debug)]
 pub struct HitResult {
     pub distance: f64,
     pub normal: Vector3

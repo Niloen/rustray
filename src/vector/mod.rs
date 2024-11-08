@@ -57,6 +57,10 @@ impl Vector3 {
     pub(crate) fn normalize(&self) -> Vector3 {
         self.div(self.length())
     }
+    
+    pub fn cos_angle(&self, v: Vector3) -> f64 {
+        self.dot(v).div(self.length() * v.length())
+    }
 }
 impl Add<Vector3> for Vector3 {
     type Output = Vector3;
