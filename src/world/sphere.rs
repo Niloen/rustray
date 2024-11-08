@@ -1,12 +1,14 @@
+use image::Rgb;
 use crate::vector::Vector3;
 use crate::world::object::{HitResult, Object};
 use crate::world::ray::Ray;
 
 impl Sphere {
-    pub fn new(center: Vector3, radius: f64) -> Sphere {
+    pub fn new(center: Vector3, radius: f64, color: Rgb<f64>) -> Sphere {
         Sphere {
             center,
             radius,
+            color
         }
     }
 }
@@ -37,7 +39,8 @@ impl Object for Sphere {
 
         Some(HitResult {
             distance: t0,
-            normal: (ray.at(t0) - self.center).normalize()
+            normal: (ray.at(t0) - self.center).normalize(),
+            color: self.color
         })
     }
 }
@@ -46,4 +49,5 @@ impl Object for Sphere {
 pub struct Sphere {
     center: Vector3,
     radius: f64,
+    color: Rgb<f64>
 }

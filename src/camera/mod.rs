@@ -2,7 +2,7 @@ use std::result::Iter;
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
 extern crate image;
-use image::{ImageBuffer, Rgb, RgbImage};
+use image::{ImageBuffer, Pixel, Rgb, RgbImage};
 use crate::world::World;
 
 pub struct Camera {
@@ -42,7 +42,7 @@ impl Camera {
 
         // Transform local direction to world space
         let world_direction = right * local_direction.x + up * local_direction.y + forward * local_direction.z;
-        
+
         // Create the ray
         Ray {
             origin: self.base.origin,  // Camera position
@@ -67,9 +67,10 @@ impl Camera {
             if let Some(obj) = world.closest_along(&ray) {
                 let info = obj.hit(&ray).unwrap();
 
-                let light = (ray.direction.cos_angle(info.normal).abs() * 255.0) as u8;
+                let light = (ray.direction.cos_angle(info.normal).abs());
+                let color: Rgb<u8> = Rgb(info.color.0.map(|x| (x * light * 255.0) as u8));
 
-                image.put_pixel(c.0, c.1, Rgb([light, light, light]));
+                image.put_pixel(c.0, c.1, color);
             }
 
         });
