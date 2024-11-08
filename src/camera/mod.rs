@@ -1,9 +1,8 @@
-use std::result::Iter;
+extern crate image;
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
-extern crate image;
-use image::{ImageBuffer, Pixel, Rgb, RgbImage};
 use crate::world::World;
+use image::{Rgb, RgbImage};
 
 pub struct Camera {
     base: Ray,
@@ -18,7 +17,7 @@ impl Camera {
         let (x, y) = coord;
         let aspect_ratio = self.width as f64 / self.height as f64;
         let fov_radians = (self.fov.to_radians()) / 2.0;
-        let scale = (fov_radians).tan();
+        let scale = fov_radians.tan();
 
         // Convert pixel coordinates (x, y) to normalized device coordinates (NDC)
         let pixel_ndc_x = (x as f64 + 0.5) / self.width as f64;   // Add 0.5 to center the ray in the pixel
@@ -67,7 +66,7 @@ impl Camera {
             if let Some(obj) = world.closest_along(&ray) {
                 let info = obj.hit(&ray).unwrap();
 
-                let light = (ray.direction.cos_angle(info.normal).abs());
+                let light = ray.direction.cos_angle(info.normal).abs();
                 let color: Rgb<u8> = Rgb(info.color.0.map(|x| (x * light * 255.0) as u8));
 
                 image.put_pixel(c.0, c.1, color);

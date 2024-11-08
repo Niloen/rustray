@@ -1,10 +1,9 @@
-use image::codecs::png::PngEncoder;
-use image::Rgb;
 use crate::camera::Camera;
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
 use crate::world::sphere::Sphere;
 use crate::world::World;
+use image::Rgb;
 
 mod world;
 mod vector;

@@ -15,9 +15,9 @@ impl Sphere {
 
 impl Object for Sphere {
     fn hit(&self, ray: &Ray) -> Option<HitResult> {
-        let L = self.center - ray.origin;
-        let tca = L.dot(ray.direction);
-        let d2 = L.dot(L) - tca * tca;
+        let l = self.center - ray.origin;
+        let tca = l.dot(ray.direction);
+        let d2 = l.dot(l) - tca * tca;
         if d2 > self.radius * self.radius {
             return None
         }
@@ -30,7 +30,7 @@ impl Object for Sphere {
             std::mem::swap(&mut t0, &mut t1);
         }
 
-        if (t0 < 0.0) {
+        if t0 < 0.0 {
             t0 = t1; // If t0 is negative, let's use t1 instead.
             if t0 < 0.0 {
                 return None; // Both t0 and t1 are negative.
