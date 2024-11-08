@@ -32,13 +32,21 @@ impl Camera {
         let pixel_camera_x = pixel_screen_x * aspect_ratio * scale;
         let pixel_camera_y = pixel_screen_y * scale;
 
-        // Direction vector from the camera's origin to the pixel
-        let direction = Vector3::new(pixel_camera_x, pixel_camera_y, 1.0).normalize(); // Assuming -Z is forward
+        // Create the local direction vector in the camera space
+        let local_direction = Vector3::new(pixel_camera_x, pixel_camera_y, 1.0).normalize(); // Assuming -Z is forward
 
+        // Use the camera's base direction and up vector to create the world space direction
+        let forward = self.base.direction.normalize();
+        let right = Vector3::new(0.0, 1.0, 0.0).cross(&forward).normalize(); // Assuming an up vector of (0, 1, 0)
+        let up = forward.cross(&right).normalize();
+
+        // Transform local direction to world space
+        let world_direction = right * local_direction.x + up * local_direction.y + forward * local_direction.z;
+        
         // Create the ray
         Ray {
             origin: self.base.origin,  // Camera position
-            direction,                 // Computed direction
+            direction: world_direction.normalize(),  // Transformed direction
         }
     }
 

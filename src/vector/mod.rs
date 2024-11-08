@@ -2,9 +2,9 @@ use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub(crate) struct Vector3 {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vector3 {
@@ -23,7 +23,15 @@ impl Vector3 {
         }
     }
 
-    pub fn add(&self, v: Vector3) -> Vector3 {
+    pub fn cross(&self, v: &Vector3) -> Vector3 {
+        Vector3 {
+            x: self.y * v.z - self.z * v.y,
+            y: self.z * v.x - self.x * v.z,
+            z: self.x * v.y - self.y * v.x,
+        }
+    }
+    
+    fn add(&self, v: Vector3) -> Vector3 {
         Vector3 {
             x: self.x + v.x,
             y: self.y + v.y,
