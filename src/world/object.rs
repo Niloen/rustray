@@ -8,7 +8,7 @@ pub struct HitResult {
     pub color: Rgb<f64>
 }
 
-pub trait Object {
+pub trait Object: Send + Sync {
     fn intersects(&self, ray: &Ray) -> Option<f64> {
         self.hit(ray).map(|r| r.distance)
     }

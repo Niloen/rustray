@@ -1,4 +1,6 @@
 extern crate image;
+
+use std::sync::Arc;
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
 use crate::world::World;
@@ -58,23 +60,21 @@ impl Camera {
         })
     }
 
+    fn trace_pixel(&self, world: &World, x: u32, y: u32) -> Rgb<u8> {
+        let ray = self.ray_at((x,y));
+        if let Some(obj) = world.closest_along(&ray) {
+            let info = obj.hit(&ray).unwrap();
+
+            let light = ray.direction.cos_angle(info.normal).abs();
+            
+            Rgb(info.color.0.map(|x| (x * light * 255.0) as u8));
+        }
+        
+        Rgb([0,0,0])
+    }
+    
     pub fn take_photo(&self, world: &World) -> RgbImage {
-        let mut image = RgbImage::new(self.width, self.height);
-
-        self.iter_pixels().for_each(|c| {
-            let ray = self.ray_at(c);
-            if let Some(obj) = world.closest_along(&ray) {
-                let info = obj.hit(&ray).unwrap();
-
-                let light = ray.direction.cos_angle(info.normal).abs();
-                let color: Rgb<u8> = Rgb(info.color.0.map(|x| (x * light * 255.0) as u8));
-
-                image.put_pixel(c.0, c.1, color);
-            }
-
-        });
-
-        image
+        RgbImage::from_par_fn(self.width, self.height, |x, y| self.trace_pixel(world, x, y))
     }
 
     pub fn new(base: Ray, width: u32, height: u32, fov: f64) -> Self {
