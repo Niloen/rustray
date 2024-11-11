@@ -8,12 +8,14 @@ pub struct HitResult {
     pub color: Rgb<f64>
 }
 
-pub struct Intersection {
+pub struct Intersection<'a> {
     pub distance: f64,
-    result: Box<dyn Fn () -> HitResult>,
+    result: Box<dyn Fn () -> HitResult + 'a>,
 }
 
-impl Intersection {
+impl<'a> Intersection<'a> {
+    
+    
     /// Creates a new `Intersection` from a `HitResult` with lazy evaluation.
     pub fn from_result(hr: HitResult) -> Self {
         Self {
@@ -26,8 +28,13 @@ impl Intersection {
     pub fn get_result(&self) -> HitResult {
         (self.result)()
     }
+
+    pub fn new(distance: f64, result: Box<dyn Fn() -> HitResult + 'a>) -> Intersection<'a> {
+        Self { distance, result }
+    }
 }
 
-pub trait Object: Send + Sync {
-    fn intersects(&self, ray: &Ray) -> Option<Intersection>;
+pub trait Object<'a>: Send + Sync {
+    fn intersects<'b, 'c, 'z>(&'b self, ray: &'c Ray) -> Option<Intersection<'z>>
+        where 'a: 'z, 'b : 'z, 'c: 'z;
 }

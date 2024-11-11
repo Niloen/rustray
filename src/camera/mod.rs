@@ -52,8 +52,10 @@ impl Camera {
     }
 
     fn trace_pixel(&self, world: &World, x: u32, y: u32) -> Rgb<u8> {
-        let ray = self.ray_at((x,y));
-        match world.closest_along(&ray) {
+        let ray = self.ray_at((x,y));        
+
+        let intersection_opt = World::closest_along(world, &ray);
+        match intersection_opt {
             Some(intersection) => {
                 let info = intersection.get_result();
 

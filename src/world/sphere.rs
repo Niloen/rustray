@@ -13,14 +13,10 @@ impl Sphere {
     }
 }
 
-impl Object for Sphere {
-    fn intersects(&self, ray: &Ray) -> Option<Intersection> {
-        self.hit(ray).map(Intersection::from_result)
-    }
-}
-
-impl Sphere {
-    fn hit(&self, ray: &Ray) -> Option<HitResult> {
+impl<'a> Object<'a> for  Sphere {
+    fn intersects<'b, 'c, 'z>(&'b self, ray: &'c Ray) -> Option<Intersection<'z>>
+    where 'a: 'z, 'b : 'z, 'c: 'z
+    {
         let l = self.center - ray.origin;
         let tca = l.dot(ray.direction);
         let d2 = l.dot(l) - tca * tca;
@@ -43,11 +39,18 @@ impl Sphere {
             }
         }
 
-        Some(HitResult {
-            distance: t0,
-            normal: (ray.at(t0) - self.center).normalize(),
-            color: self.color
-        })
+        let center = self.center;
+        Some(
+            Intersection::new(
+                t0,
+                Box::new(move || {
+                    HitResult {
+                        distance: t0,
+                        normal: (ray.at(t0) - center).normalize(),
+                        color: self.color
+                    }
+                })
+            ))
     }
 }
 #[derive(Debug)]

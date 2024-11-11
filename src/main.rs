@@ -1,17 +1,17 @@
-use std::thread;
-use std::time::Instant;
-use async_channel::{Sender};
 use crate::camera::Camera;
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
 use crate::world::sphere::Sphere;
 use crate::world::World;
-use image::{Rgb};
-use gtk4 as gtk;
+use async_channel::Sender;
 use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow};
+use gtk4 as gtk;
 use gtk4::gdk_pixbuf::{Colorspace, Pixbuf};
-use gtk4::{Orientation, Box, Label, Align, Picture};
+use gtk4::{Align, Box, Label, Orientation, Picture};
+use image::Rgb;
+use std::thread;
+use std::time::Instant;
 mod world;
 mod vector;
 mod camera;
@@ -68,13 +68,7 @@ fn main() -> glib::ExitCode {
 }
 
 fn generate_image(width: u32, height: u32, tx: Sender<(u32, u32, Rgb<u8>)>) {
-    let mut world = World::new();
-    world.add(Sphere::new(Vector3::new(0.0, 0.0, 100.0), 20.0, Rgb([1.0, 0.0, 0.0])));
-    for i in 1..=1000 {
-        let ifl = i as f64;
-
-        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([0.0, 1.0, ifl / 1000.0])));
-    }
+    let world = create_world();
 
     let camera_base = Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.1, 1.0).normalize());
     let camera = Camera::new(camera_base, width, height, 50.0);
@@ -83,7 +77,18 @@ fn generate_image(width: u32, height: u32, tx: Sender<(u32, u32, Rgb<u8>)>) {
     let image = camera.take_photo(&world, tx);
     let photo_duration = photo_start_time.elapsed();
     println!("Photo generation completed in: {:?}", photo_duration);
-    
     image.save("output.png").unwrap();
+    
     println!("Generated image");
+}
+
+fn create_world<'a>() -> World<'a> {
+    let mut world = World::new();
+    world.add(Sphere::new(Vector3::new(0.0, 0.0, 100.0), 20.0, Rgb([1.0, 0.0, 0.0])));
+    for i in 1..=1000 {
+        let ifl = i as f64;
+
+        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([0.0, 1.0, ifl / 1000.0])));
+    }
+    world
 }
