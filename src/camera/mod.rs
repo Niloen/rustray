@@ -1,6 +1,6 @@
 extern crate image;
 
-use std::sync::Arc;
+use async_channel::Sender;
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
 use crate::world::World;
@@ -51,30 +51,31 @@ impl Camera {
         }
     }
 
-    fn iter_pixels(&self) -> impl Iterator<Item = (u32, u32)> {
-        let width = self.width;
-        let height = self.height;
-
-        (0..width).flat_map(move |x| {
-            (0..height).map(move |y| (x, y))
-        })
-    }
-
     fn trace_pixel(&self, world: &World, x: u32, y: u32) -> Rgb<u8> {
         let ray = self.ray_at((x,y));
-        if let Some(obj) = world.closest_along(&ray) {
-            let info = obj.hit(&ray).unwrap();
+        match world.closest_along(&ray) {
+            Some(obj) => {
+                let info = obj.hit(&ray).unwrap();
 
-            let light = ray.direction.cos_angle(info.normal).abs();
-            
-            Rgb(info.color.0.map(|x| (x * light * 255.0) as u8));
+                let light = ray.direction.cos_angle(info.normal).abs();
+
+                Rgb(info.color.0.map(|x| (x * light * 255.0) as u8))
+            }
+            None => Rgb([0,0,0])
         }
-        
-        Rgb([0,0,0])
     }
     
-    pub fn take_photo(&self, world: &World) -> RgbImage {
-        RgbImage::from_par_fn(self.width, self.height, |x, y| self.trace_pixel(world, x, y))
+    pub fn take_photo(&self, world: &World, on_trace: Sender<(u32, u32, Rgb<u8>)>) -> RgbImage {
+        RgbImage::from_par_fn(self.width, self.height, |x, y| {
+            let rgb = self.trace_pixel(world, x, y);
+            match on_trace.send_blocking((x, y, rgb)) {
+                Err(e) => {
+                    println!("Error sending trace: {:?}", e);
+                }
+                Ok(_) => {}
+            }
+            rgb
+        })
     }
 
     pub fn new(base: Ray, width: u32, height: u32, fov: f64) -> Self {
