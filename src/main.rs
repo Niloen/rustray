@@ -10,7 +10,7 @@ use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow};
 use gtk4::gdk_pixbuf::{Colorspace, Pixbuf};
-use gtk4::Image;
+use gtk4::{Image, Orientation, Box, Label, Align, Picture};
 mod world;
 mod vector;
 mod camera;
@@ -20,22 +20,33 @@ fn main() -> glib::ExitCode {
         .application_id("org.example.RealtimeRenderer")
         .build();
 
-    app.connect_activate(|app| {
+    let width = 1024;
+    let height = 768;
+    app.connect_activate(move |app| {
         let window = ApplicationWindow::builder()
             .application(app)
-            .default_width(3800)
-            .default_height(1920)
+            .default_width(width)
+            .default_height(height)
             .title("Realtime Renderer")
             .build();
 
         // Create an initial empty Pixbuf for the Image widget.
-        let width = 800;
-        let height = 600;
         let pixbuf = Pixbuf::new(Colorspace::Rgb, false, 8, width, height).unwrap();
-        let image_widget = Image::from_pixbuf(Some(&pixbuf));
-        window.set_child(Some(&image_widget));
+        let image_widget = Picture::for_pixbuf(&pixbuf);
 
-
+        image_widget.set_hexpand(true);
+        image_widget.set_vexpand(true);
+        image_widget.set_halign(Align::Fill);
+        image_widget.set_valign(Align::Fill);
+        image_widget.set_vexpand(true);
+        
+        let container = Box::new(Orientation::Vertical, 0);
+        container.append(&Label::new(Some("hello world")));
+        container.append(&image_widget);
+        container.set_hexpand(true);
+        container.set_vexpand(true);
+        
+        window.set_child(Some(&container));
         window.present();
 
         glib::MainContext::default().spawn_local(async move {
@@ -47,7 +58,7 @@ fn main() -> glib::ExitCode {
 
             while let Ok((x, y, Rgb([r,g,b]))) = rx.recv().await {
                 pixbuf.put_pixel(x, y, r, g, b, 0);
-                image_widget.set_from_pixbuf(Some(&pixbuf));
+                image_widget.set_pixbuf(Some(&pixbuf));
             }
         });
     });
@@ -58,7 +69,11 @@ fn main() -> glib::ExitCode {
 fn generate_image(width: u32, height: u32, tx: Sender<(u32, u32, Rgb<u8>)>) {
     let mut world = World::new();
     world.add(Sphere::new(Vector3::new(0.0, 0.0, 100.0), 20.0, Rgb([1.0, 0.0, 0.0])));
-    world.add(Sphere::new(Vector3::new(20.0, 0.5, 200.0), 50.0, Rgb([0.0, 1.0, 0.0])));
+    for i in 1..=1000 {
+        let ifl = i as f64;
+        
+        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([0.0, 1.0, ifl / 1000.0])));
+    }
 
     let camera_base = Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.1, 1.0).normalize());
     let camera = Camera::new(camera_base, width, height, 50.0);
