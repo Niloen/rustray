@@ -10,7 +10,7 @@ use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow};
 use gtk4::gdk_pixbuf::{Colorspace, Pixbuf};
-use gtk4::{Image, Orientation, Box, Label, Align, Picture};
+use gtk4::{Orientation, Box, Label, Align, Picture};
 mod world;
 mod vector;
 mod camera;

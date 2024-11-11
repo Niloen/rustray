@@ -54,8 +54,8 @@ impl Camera {
     fn trace_pixel(&self, world: &World, x: u32, y: u32) -> Rgb<u8> {
         let ray = self.ray_at((x,y));
         match world.closest_along(&ray) {
-            Some(obj) => {
-                let info = obj.hit(&ray).unwrap();
+            Some(intersection) => {
+                let info = intersection.get_result();
 
                 let light = ray.direction.cos_angle(info.normal).abs();
 

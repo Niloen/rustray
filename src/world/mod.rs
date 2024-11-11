@@ -1,4 +1,4 @@
-use crate::world::object::Object;
+use crate::world::object::{Intersection, Object};
 use crate::world::ray::Ray;
 
 pub mod ray;
@@ -20,12 +20,11 @@ impl<'a> World<'a> {
         self.objects.push(Box::new(object));
     }
     
-    pub fn closest_along(&self, ray: &Ray) -> Option<&dyn Object> {
+    pub fn closest_along(&self, ray: &Ray) -> Option<Intersection> {
         self.objects.iter()
-            .map(|o| (o.as_ref(), o.intersects(ray)))
-            .filter(|(_, d)| d.is_some())
-            .min_by(|(_, d1), (_, d2)| 
-            d1.partial_cmp(d2).unwrap())
-            .map(|(o, _)| o)
+            .map(|o|o.intersects(ray))
+            .flat_map(|o| o)
+            .min_by(|i1, i2| 
+            i1.distance.partial_cmp(&i2.distance).unwrap())
     }
 }
