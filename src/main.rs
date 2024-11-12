@@ -12,62 +12,15 @@ use gtk4::{Align, Box, Label, Orientation, Picture};
 use image::Rgb;
 use std::thread;
 use std::time::Instant;
+use crate::visualize::show;
+
 mod world;
 mod vector;
 mod camera;
+mod visualize;
 
-fn main() -> glib::ExitCode {
-    let app = Application::builder()
-        .application_id("org.example.RealtimeRenderer")
-        .build();
 
-    let width = 1024;
-    let height = 768;
-    app.connect_activate(move |app| {
-        let window = ApplicationWindow::builder()
-            .application(app)
-            .default_width(width)
-            .default_height(height)
-            .title("Realtime Renderer")
-            .build();
-
-        // Create an initial empty Pixbuf for the Image widget.
-        let pixbuf = Pixbuf::new(Colorspace::Rgb, false, 8, width, height).unwrap();
-        let image_widget = Picture::for_pixbuf(&pixbuf);
-
-        image_widget.set_hexpand(true);
-        image_widget.set_vexpand(true);
-        image_widget.set_halign(Align::Fill);
-        image_widget.set_valign(Align::Fill);
-        image_widget.set_vexpand(true);
-
-        let container = Box::new(Orientation::Vertical, 0);
-        container.append(&Label::new(Some("hello world")));
-        container.append(&image_widget);
-        container.set_hexpand(true);
-        container.set_vexpand(true);
-
-        window.set_child(Some(&container));
-        window.present();
-
-        glib::MainContext::default().spawn_local(async move {
-            let (tx, rx) = async_channel::unbounded::<(u32, u32, Rgb<u8>)>();
-
-            thread::spawn(move || {
-                generate_image(width as u32, height as u32, tx)
-            });
-
-            while let Ok((x, y, Rgb([r,g,b]))) = rx.recv().await {
-                pixbuf.put_pixel(x, y, r, g, b, 0);
-                image_widget.set_pixbuf(Some(&pixbuf));
-            }
-        });
-    });
-
-    app.run()
-}
-
-fn generate_image(width: u32, height: u32, tx: Sender<(u32, u32, Rgb<u8>)>) {
+fn generate_image(width: u32, height: u32, tx: impl Fn((u32, u32, Rgb<u8>)) + Send + Sync) {
     let world = create_world();
 
     let camera_base = Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.1, 1.0).normalize());
@@ -78,7 +31,7 @@ fn generate_image(width: u32, height: u32, tx: Sender<(u32, u32, Rgb<u8>)>) {
     let photo_duration = photo_start_time.elapsed();
     println!("Photo generation completed in: {:?}", photo_duration);
     image.save("output.png").unwrap();
-    
+
     println!("Generated image");
 }
 
@@ -91,4 +44,17 @@ fn create_world<'a>() -> World<'a> {
         world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([0.0, 1.0, ifl / 1000.0])));
     }
     world
+}
+
+fn main() {
+    let visualize = false;
+    let width: u32 = 3820;
+    let height: u32 = 1920;
+    if (visualize) {
+        show(width as i32, height as i32, move |tx| {
+            generate_image(width, height, |m|tx.send_blocking(m).unwrap());
+        })
+    } else {
+        generate_image(width, height, |m| {})
+    }
 }

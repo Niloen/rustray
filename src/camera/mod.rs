@@ -67,15 +67,10 @@ impl Camera {
         }
     }
     
-    pub fn take_photo(&self, world: &World, on_trace: Sender<(u32, u32, Rgb<u8>)>) -> RgbImage {
+    pub fn take_photo(&self, world: &World, on_trace: impl Fn((u32, u32, Rgb<u8>)) + Send + Sync) -> RgbImage {
         RgbImage::from_par_fn(self.width, self.height, |x, y| {
             let rgb = self.trace_pixel(world, x, y);
-            match on_trace.send_blocking((x, y, rgb)) {
-                Err(e) => {
-                    println!("Error sending trace: {:?}", e);
-                }
-                Ok(_) => {}
-            }
+            on_trace((x, y, rgb));
             rgb
         })
     }
