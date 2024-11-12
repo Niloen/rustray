@@ -53,12 +53,10 @@ impl Camera {
     fn trace_pixel(&self, world: &World, x: u32, y: u32) -> Rgb<u8> {
         let ray = self.ray_at((x,y));        
 
-        let intersection_opt = World::closest_along(world, &ray);
+        let intersection_opt = World::cast(world, &ray);
         match intersection_opt {
             Some(info) => {
-                let light = ray.direction.cos_angle(info.normal).abs();
-
-                Rgb(info.color.0.map(|x| (x * light * 255.0) as u8))
+                Rgb(info.color.0.map(|x| (x * 255.0) as u8))
             }
             None => Rgb([0,0,0])
         }

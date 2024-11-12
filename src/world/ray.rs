@@ -10,7 +10,7 @@ impl Ray {
     pub fn new(origin: Vector3, direction: Vector3) -> Ray {
         Ray {
             origin,
-            direction,
+            direction: direction.normalize(),
         }
     }
     pub fn at(&self, distance: f64) -> Vector3 {
