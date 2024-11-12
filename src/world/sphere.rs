@@ -11,19 +11,8 @@ impl Sphere {
             color,
         }
     }
-}
-impl<'a> Intersecting<'a> for Sphere {
-    fn intersects<'b, 'z>(&'b self, ray: &Ray) -> Option<Intersection<'z, 'a>>
-    where
-        'a: 'z,
-        'b: 'z,
-    {
-        self.hit(ray).map(move |h| Intersection::new(h.distance, self))
-    }
-}
 
-impl<'a> Object<'a> for Sphere {
-    fn hit(&self, ray: &Ray) -> Option<HitResult> {
+    fn distance(&self, ray: &Ray) -> Option<f64> {
         let l = self.center - ray.origin;
         let tca = l.dot(ray.direction);
         let d2 = l.dot(l) - tca * tca;
@@ -44,8 +33,22 @@ impl<'a> Object<'a> for Sphere {
                 return None; // Both t0 and t1 are negative.
             }
         }
+        Some(t0)
+    }
+}
+impl<'a> Intersecting<'a> for Sphere {
+    fn intersects<'b, 'z>(&'b self, ray: &Ray) -> Option<Intersection<'z, 'a>>
+    where
+        'a: 'z,
+        'b: 'z,
+    {
+        self.distance(ray).map(move |distance| Intersection::new(distance, self))
+    }
+}
 
-        Some(HitResult {
+impl<'a> Object<'a> for Sphere {
+    fn hit(&self, ray: &Ray) -> Option<HitResult> {
+        return self.distance(ray).map(|t0| HitResult {
             distance: t0,
             normal: (ray.at(t0) - self.center).normalize(),
             color: self.color,
