@@ -1,5 +1,5 @@
 use crate::vector::Vector3;
-use crate::world::object::{HitResult, Intersection, Object};
+use crate::world::object::{HitResult, Intersecting, Intersection, Object};
 use crate::world::ray::Ray;
 use image::Rgb;
 
@@ -12,8 +12,7 @@ impl Sphere {
         }
     }
 }
-
-impl<'a> Object<'a> for Sphere {
+impl<'a> Intersecting<'a> for Sphere {
     fn intersects<'b, 'z>(&'b self, ray: &Ray) -> Option<Intersection<'z, 'a>>
     where
         'a: 'z,
@@ -21,6 +20,9 @@ impl<'a> Object<'a> for Sphere {
     {
         self.hit(ray).map(move |h| Intersection::new(h.distance, self))
     }
+}
+
+impl<'a> Object<'a> for Sphere {
     fn hit(&self, ray: &Ray) -> Option<HitResult> {
         let l = self.center - ray.origin;
         let tca = l.dot(ray.direction);

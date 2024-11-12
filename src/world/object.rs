@@ -22,11 +22,15 @@ impl<'a, 'b> Intersection<'a, 'b> {
     }
 }
 
-pub trait Object<'a>: Send + Sync {
+pub trait Intersecting<'a>: Send + Sync {
     fn intersects<'b, 'z>(&'b self, ray: &Ray) -> Option<Intersection<'z, 'a>>
     where
         'a: 'z,
         'b: 'z;
+}
+
+pub trait Object<'a>: Send + Sync + Intersecting<'a>{
 
     fn hit(&self, ray: &Ray) -> Option<HitResult>;
 }
+
