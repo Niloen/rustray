@@ -24,11 +24,17 @@ impl<'a> Intersecting<'a> for Group<'a> {
         'a: 'z,
         'b: 'z
     {
-        let obj = &self.objects;
-        obj.iter()
-            .map(|o|o.intersects(ray))
-            .flat_map(|o| o)
-            .min_by(|i1, i2|
-                i1.distance.partial_cmp(&i2.distance).unwrap())
+        let mut result: Option<Intersection> = None;
+        let mut shortest: f64 = f64::MAX;
+        for object in self.objects.iter() {
+            if let Some(intersection) = object.intersects(ray) {
+                if (intersection.distance < shortest) {
+                    shortest = intersection.distance;
+                    result.replace(intersection);
+                }
+            }
+        }
+        
+        result
     }
 }
