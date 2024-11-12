@@ -1,18 +1,11 @@
 use crate::camera::Camera;
 use crate::vector::Vector3;
+use crate::visualize::show;
 use crate::world::ray::Ray;
 use crate::world::sphere::Sphere;
 use crate::world::World;
-use async_channel::Sender;
-use gtk::prelude::*;
-use gtk::{glib, Application, ApplicationWindow};
-use gtk4 as gtk;
-use gtk4::gdk_pixbuf::{Colorspace, Pixbuf};
-use gtk4::{Align, Box, Label, Orientation, Picture};
 use image::Rgb;
-use std::thread;
 use std::time::Instant;
-use crate::visualize::show;
 
 mod world;
 mod vector;
@@ -50,11 +43,11 @@ fn main() {
     let visualize = false;
     let width: u32 = 3820;
     let height: u32 = 1920;
-    if (visualize) {
+    if visualize {
         show(width as i32, height as i32, move |tx| {
             generate_image(width, height, |m|tx.send_blocking(m).unwrap());
         })
     } else {
-        generate_image(width, height, |m| {})
+        generate_image(width, height, |_m| {})
     }
 }

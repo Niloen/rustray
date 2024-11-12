@@ -1,6 +1,5 @@
 extern crate image;
 
-use async_channel::Sender;
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
 use crate::world::World;
@@ -56,9 +55,7 @@ impl Camera {
 
         let intersection_opt = World::closest_along(world, &ray);
         match intersection_opt {
-            Some(intersection) => {
-                let info = intersection.get_result();
-
+            Some(info) => {
                 let light = ray.direction.cos_angle(info.normal).abs();
 
                 Rgb(info.color.0.map(|x| (x * light * 255.0) as u8))

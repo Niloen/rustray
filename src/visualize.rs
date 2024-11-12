@@ -4,7 +4,6 @@ use gtk4::{glib, Align, Application, ApplicationWindow, Label, Orientation, Pict
 use gtk4::gdk_pixbuf::{Colorspace, Pixbuf};
 use gtk4::prelude::*;
 use image::Rgb;
-use crate::generate_image;
 
 pub type ShowPixelMessage = (u32, u32, Rgb<u8>);
 

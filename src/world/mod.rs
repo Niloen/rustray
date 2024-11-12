@@ -1,4 +1,5 @@
-pub use crate::world::object::{Intersection, Object};
+use crate::world::object::HitResult;
+pub use crate::world::object::Object;
 use crate::world::ray::Ray;
 
 pub mod ray;
@@ -20,7 +21,7 @@ impl<'a> World<'a> {
         self.objects.push(Box::new(object));
     }
 
-    pub fn closest_along<'b, 'c, 'z>(&'b self, ray: &'c Ray) -> Option<Intersection<'z>>
+    pub fn closest_along<'b, 'c, 'z>(&'b self, ray: &'c Ray) -> Option<HitResult>
     where 'a: 'z, 'b: 'z, 'c: 'z {
         let obj = &self.objects;
         let i = obj.iter();
@@ -29,5 +30,6 @@ impl<'a> World<'a> {
             .flat_map(|o| o)
             .min_by(|i1, i2| 
             i1.distance.partial_cmp(&i2.distance).unwrap())
+            .and_then(|i| i.object.hit(ray))
     }
 }
