@@ -33,6 +33,7 @@ fn create_world<'a>() -> World<'a> {
     create_world2()
 }
 
+#[allow(dead_code)]
 fn create_world1<'a>() -> World<'a> {
     const MAT: BaseMaterial = BaseMaterial::DEFAULT;
     let mut world = World::new();
@@ -50,22 +51,22 @@ fn create_world1<'a>() -> World<'a> {
 fn create_world2<'a>() -> World<'a> {
     let mat: BaseMaterial = BaseMaterial::DEFAULT;
     let mirror: BaseMaterial = BaseMaterial {
-        reflectivity: 1.0,
+        reflectivity: 0.5,
+        emission: Rgb([0.3, 0.3, 0.3]),
         ..mat
     };
 
     let white = Rgb([1.0, 1.0, 1.0]);
-    let em: BaseMaterial = BaseMaterial {
-        emission: white,
-        ..mat
-    };
 
     let mut world = World::new();
     world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), white));
-    world.add(Sphere::new(Vector3::new(0.0, 0.0, 100.0), 20.0, white, &mirror));
+    world.add_light(Light::new(Ray::new(Vector3::new(-10.0, -25.0, 200.0), Vector3::new(0.0, 0.0, -1.0)), Rgb([0.2, 0.2, 0.2])));
+    world.add(Sphere::new(Vector3::new(20.0, 20.0, 100.0), 20.0, white, &mirror));
     world.add(Sphere::new(Vector3::new(200.0, 0.0, 100.0), 100.0, Rgb([1.0, 0.0, 0.0]), &mat));
     //world.add(Sphere::new(Vector3::new(-50.0, -50.0, 100.0), 50.0, Rgb([0.0, 1.0, 0.0]), &mat));
-    world.add(Cube::new(Vector3::new(-50.0, -25.0, 75.0), 25.0, Rgb([0.0, 1.0, 0.0]), &mat));
+    world.add(Cube::new(Vector3::new(-10.0, -25.0, 50.0), 20.0, Rgb([1.0, 1.0, 1.0]), &mat));
+    world.add(Cube::new(Vector3::new(-50.0, -25.0, 120.0), 30.0, Rgb([1.0, 1.0, 0.0]), &mat));
+    world.add(Cube::new(Vector3::new(0.0, -20.0, 300.0), 100.0, Rgb([1.0, 1.0, 1.0]), &mirror));
     world
 }
 

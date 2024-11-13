@@ -84,7 +84,6 @@ impl<'a> Object<'a> for Cube<'a> {
         self.intersect_with_ray(ray).map(|distance| {
             let hit_position = ray.at(distance);
             HitResult {
-                distance,
                 color: self.color,
                 position: hit_position,
                 normal: self.normal_at(&hit_position),

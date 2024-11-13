@@ -4,7 +4,6 @@ use crate::world::material::Material;
 use crate::world::ray::Ray;
 #[derive(Debug)]
 pub struct HitResult<'a> {
-    pub distance: f64,
     pub position: Vector3,
     pub normal: Vector3,
     pub color: Rgb<f64>,

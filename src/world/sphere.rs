@@ -53,7 +53,6 @@ impl<'a> Object<'a> for Sphere<'a> {
         return self.distance(ray).map(|t0| {
             let position = ray.at(t0);
             HitResult {
-                distance: t0,
                 color: self.color,
                 position,
                 normal: (position - self.center).normalize(),
