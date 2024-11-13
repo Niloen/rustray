@@ -2,13 +2,15 @@ use crate::vector::Vector3;
 use crate::world::object::{HitResult, Intersecting, Intersection, Object};
 use crate::world::ray::Ray;
 use image::Rgb;
+use crate::world::material::Material;
 
-impl Sphere {
-    pub fn new(center: Vector3, radius: f64, color: Rgb<f64>) -> Sphere {
+impl<'a> Sphere<'a> {
+    pub fn new(center: Vector3, radius: f64, color: Rgb<f64>, material: &'a dyn Material) -> Sphere<'a> {
         Sphere {
             center,
             radius,
             color,
+            material
         }
     }
 
@@ -36,7 +38,7 @@ impl Sphere {
         Some(t0)
     }
 }
-impl<'a> Intersecting<'a> for Sphere {
+impl<'a> Intersecting<'a> for Sphere<'a> {
     fn intersects<'b, 'z>(&'b self, ray: &Ray) -> Option<Intersection<'z, 'a>>
     where
         'a: 'z,
@@ -46,18 +48,24 @@ impl<'a> Intersecting<'a> for Sphere {
     }
 }
 
-impl<'a> Object<'a> for Sphere {
+impl<'a> Object<'a> for Sphere<'a> {
     fn hit(&self, ray: &Ray) -> Option<HitResult> {
-        return self.distance(ray).map(|t0| HitResult {
-            distance: t0,
-            normal: (ray.at(t0) - self.center).normalize(),
-            color: self.color,
+        return self.distance(ray).map(|t0| {
+            let position = ray.at(t0);
+            HitResult {
+                distance: t0,
+                color: self.color,
+                position,
+                normal: (position - self.center).normalize(),
+                material: self.material,
+            }
         })
     }
 }
 #[derive(Debug)]
-pub struct Sphere {
+pub struct Sphere<'a> {
     center: Vector3,
     radius: f64,
     color: Rgb<f64>,
+    material: &'a dyn Material,
 }

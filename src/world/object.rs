@@ -1,11 +1,14 @@
 use image::Rgb;
 use crate::vector::Vector3;
+use crate::world::material::Material;
 use crate::world::ray::Ray;
-#[derive(Debug, Clone)]
-pub struct HitResult {
+#[derive(Debug)]
+pub struct HitResult<'a> {
     pub distance: f64,
+    pub position: Vector3,
     pub normal: Vector3,
     pub color: Rgb<f64>,
+    pub material: &'a dyn Material,
 }
 
 pub struct Intersection<'a, 'b> {

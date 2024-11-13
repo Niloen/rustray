@@ -1,16 +1,19 @@
-use std::ops::Neg;
 use image::{Pixel, Rgb};
+pub use crate::world::cast::RayCaster;
 use crate::world::group::Group;
 pub use crate::world::light::Light;
 use crate::world::object::{HitResult, Intersecting};
 pub use crate::world::object::Object;
 use crate::world::ray::Ray;
+pub use crate::world::material::{Material, BaseMaterial};
 
 pub mod ray;
 mod object;
 pub mod sphere;
 mod group;
 mod light;
+mod material;
+mod cast;
 
 pub struct World<'a> {
     root: Group<'a>,
@@ -44,16 +47,23 @@ impl<'a> World<'a> {
             }).reduce(|c1,c2|c1.map2(&c2, |x1,x2|min(1.0, x1 + x2)))
             .unwrap_or_else(|| Rgb([0.0, 0.0, 0.0]))
     }
-    
-    pub fn cast<'b, 'c, 'z>(&'b self, ray: &'c Ray) -> Option<HitResult>
-    where 'a: 'z, 'b: 'z, 'c: 'z {
+}
+
+impl<'a> RayCaster for World<'a> {
+    fn cast(&self, ray: &Ray, depth: u32) -> Option<HitResult>
+    {
+        if depth == 0 {
+            return None
+        }
         self.root.intersects(ray)
             .and_then(|i| i.object.hit(ray))
             .map(|hr| {
                 let normal_ray = Ray::new(ray.at(hr.distance), hr.normal);
                 
+                let color = hr.material.shade(ray, &hr, self, depth);
+                
                 HitResult {
-                    color: self.illumination(&normal_ray).map2(&hr.color, |c1, c2| c1 * c2),
+                    color: self.illumination(&normal_ray).map2(&color, |c1, c2| c1 * c2),
                     ..hr
                 }
             })
