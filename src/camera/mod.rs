@@ -3,8 +3,7 @@ extern crate image;
 use crate::vector::Vector3;
 use crate::world::RayCaster;
 use crate::world::ray::Ray;
-use crate::world::World;
-use image::{Rgb, RgbImage};
+use image::{Rgb, RgbImage, Pixel};
 
 pub struct Camera {
     base: Ray,
@@ -54,13 +53,9 @@ impl Camera {
     fn trace_pixel(&self, caster: &impl RayCaster, x: u32, y: u32) -> Rgb<u8> {
         let ray = self.ray_at((x,y));        
 
-        let intersection_opt = caster.cast(&ray, 5);
-        match intersection_opt {
-            Some(info) => {
-                Rgb(info.color.0.map(|x| (x * 255.0) as u8))
-            }
-            None => Rgb([0,0,0])
-        }
+        let color = caster.cast(&ray, 5);
+        
+        Rgb(color.0.map(|x| (x * 255.0) as u8))
     }
     
     pub fn take_photo(&self, caster: &impl RayCaster, on_trace: impl Fn((u32, u32, Rgb<u8>)) + Send + Sync) -> RgbImage {

@@ -50,11 +50,12 @@ impl<'a> World<'a> {
 }
 
 impl<'a> RayCaster for World<'a> {
-    fn cast(&self, ray: &Ray, depth: u32) -> Option<HitResult>
+    fn cast(&self, ray: &Ray, depth: u32) -> Rgb<f64>
     {
         if depth == 0 {
-            return None
+            return Rgb([0.0, 0.0, 0.0]);
         }
+        
         self.root.intersects(ray)
             .and_then(|i| i.object.hit(ray))
             .map(|hr| {
@@ -62,10 +63,8 @@ impl<'a> RayCaster for World<'a> {
                 
                 let color = hr.material.shade(ray, &hr, self, depth);
                 
-                HitResult {
-                    color: self.illumination(&normal_ray).map2(&color, |c1, c2| c1 * c2),
-                    ..hr
-                }
+                self.illumination(&normal_ray).map2(&color, |c1, c2| c1 * c2)
             })
+            .unwrap_or(Rgb([0.0, 0.0, 0.0]))
     }
 }

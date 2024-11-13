@@ -47,9 +47,7 @@ impl BaseMaterial {
     fn reflected_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
         let reflected_direction = ray.reflect(hit.normal).direction;
         let reflected_ray = Ray::new(hit.position, reflected_direction);
-        let reflected_color = caster.cast(&reflected_ray, depth - 1)
-          .map(|hr| hr.color)
-            .unwrap_or(Rgb([0.0, 0.0, 0.0]));
+        let reflected_color = caster.cast(&reflected_ray, depth - 1);
         reflected_color
     }
 }
