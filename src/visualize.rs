@@ -1,8 +1,8 @@
-use std::thread;
-use std::thread::yield_now;
+use std::time::Duration;
 use async_channel::Sender;
 use gtk4::{gio, glib, Align, Application, ApplicationWindow, Label, Orientation, Picture};
 use gtk4::gdk_pixbuf::{Colorspace, Pixbuf};
+use gtk4::glib::timeout_future;
 use gtk4::prelude::*;
 use image::Rgb;
 
@@ -47,16 +47,23 @@ pub fn show(width: i32, height: i32, f: impl Fn(Sender<ShowPixelMessage>) + Copy
                 f(tx)
             });
 
-
-            let mut c = 100000;
-            while let Ok((x, y, Rgb([r,g,b]))) = rx.recv().await {
+            while let Ok((x, y, Rgb([r, g, b]))) = rx.recv().await {
+                // Apply the initial received pixel
                 pixbuf.put_pixel(x, y, r, g, b, 0);
-                image_widget.set_pixbuf(Some(&pixbuf));
-                c -= 1;
-                if c == 0 {
-                    glib::timeout_future(std::time::Duration::from_millis(1)).await;
-                    c = 10000;
+
+                // Process up to 100,000 more pixels without blocking
+                for _ in 0..100_000 {
+                    match rx.try_recv() {
+                        Ok((x, y, Rgb([r, g, b]))) => pixbuf.put_pixel(x, y, r, g, b, 0),
+                        Err(_) => break, // Exit if there are no more messages immediately available
+                    }
                 }
+
+                // Update the image widget with the new pixbuf state
+                image_widget.set_pixbuf(Some(&pixbuf));
+
+                // Yield control to GTK to keep the UI responsive
+                timeout_future(Duration::from_millis(1)).await;
             }
         });
     });
