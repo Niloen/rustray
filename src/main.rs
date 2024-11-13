@@ -29,6 +29,10 @@ fn generate_image(width: u32, height: u32, tx: impl Fn((u32, u32, Rgb<u8>)) + Se
 }
 
 const mat: BaseMaterial = BaseMaterial::DEFAULT;
+const mirror: BaseMaterial = BaseMaterial {
+    reflectivity: 1.0,
+    ..mat
+};
 
 fn create_world<'a>() -> World<'a> {
     
@@ -39,7 +43,7 @@ fn create_world<'a>() -> World<'a> {
     for i in 1..=1000 {
         let ifl = i as f64;
 
-        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([1.0, 1.0, 1.0]), &mat));
+        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([1.0, 1.0, 1.0]), &mirror));
     }
     world
 }
