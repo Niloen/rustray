@@ -47,9 +47,16 @@ pub fn show(width: i32, height: i32, f: impl Fn(Sender<ShowPixelMessage>) + Copy
                 f(tx)
             });
 
+
+            let mut c = 100000;
             while let Ok((x, y, Rgb([r,g,b]))) = rx.recv().await {
                 pixbuf.put_pixel(x, y, r, g, b, 0);
                 image_widget.set_pixbuf(Some(&pixbuf));
+                c -= 1;
+                if c == 0 {
+                    glib::timeout_future(std::time::Duration::from_millis(1)).await;
+                    c = 10000;
+                }
             }
         });
     });
