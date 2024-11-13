@@ -14,6 +14,7 @@ mod group;
 mod light;
 mod material;
 mod cast;
+pub mod cube;
 
 pub struct World<'a> {
     root: Group<'a>,

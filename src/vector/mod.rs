@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Index, Mul, Sub};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub(crate) struct Vector3 {
@@ -6,8 +6,17 @@ pub(crate) struct Vector3 {
     pub y: f64,
     pub z: f64,
 }
+impl Index<usize> for Vector3 {
+    type Output = f64;
 
-impl Vector3 {
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => panic!("Index out of bounds for Vector3"),
+        }
+    }
 }
 
 impl Vector3 {
