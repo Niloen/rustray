@@ -37,15 +37,10 @@ impl<'a> World<'a> {
         self.lights.push(light);
     }
 
-    fn illumination(&self, ray: &Ray) -> Rgb<f64> {
+    fn illumination(&self, normal_ray: &Ray) -> Rgb<f64> {
         self.lights.iter()
             .map(|light| {
-                let mut fraction = light.towards(ray.origin).direction.cos_angle(ray.direction).neg();
-                if fraction < 0.0 {
-                    fraction = 0.0
-                }
-                    
-                light.color.map(|c|c * fraction)
+                light.illuminate(normal_ray.origin, normal_ray.direction)
             }).reduce(|c1,c2|c1.map2(&c2, |x1,x2|min(1.0, x1 + x2)))
             .unwrap_or_else(|| Rgb([0.0, 0.0, 0.0]))
     }

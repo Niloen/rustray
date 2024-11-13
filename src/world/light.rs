@@ -1,4 +1,5 @@
-use image::Rgb;
+use std::ops::Neg;
+use image::{Pixel, Rgb};
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
 
@@ -21,5 +22,14 @@ impl Light {
     
     pub fn distance_to(&self, position: Vector3) -> f64 {
         (position - self.ray.origin).length()
+    }
+    
+    pub fn illuminate(&self, position: Vector3, normal: Vector3) -> Rgb<f64> {
+        let mut fraction = self.towards(position).direction.cos_angle(normal).neg();
+        if fraction < 0.0 {
+            fraction = 0.0
+        }
+
+        self.color.map(|c|c * fraction)
     }
 }
