@@ -49,8 +49,8 @@ impl<'a> Cube<'a> {
                 return None; // No intersection
             }
         }
-
-        Some(t_min)
+        
+        if t_min <= 0.0 { None } else { Some(t_min) }
     }
 
     // Compute the normal based on the intersection point
