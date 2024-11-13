@@ -17,6 +17,10 @@ pub struct World<'a> {
     lights: Vec<Light>
 }
 
+fn min(v1: f64, v2: f64) -> f64 {
+    if v1 < v2 { v1 } else { v2 }
+}
+
 impl<'a> World<'a> {
     pub fn new() -> World<'a> {
         World {
@@ -42,7 +46,7 @@ impl<'a> World<'a> {
                 }
                     
                 light.color.map(|c|c * fraction)
-            }).reduce(|c1,c2|c1.map2(&c2, |x1,x2|x1 + x2))
+            }).reduce(|c1,c2|c1.map2(&c2, |x1,x2|min(1.0, x1 + x2)))
             .unwrap_or_else(|| Rgb([0.0, 0.0, 0.0]))
     }
     
