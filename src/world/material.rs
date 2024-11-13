@@ -10,10 +10,9 @@ pub trait Material: Send + Sync + Debug {
     fn shade(&self, ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BaseMaterial {
     pub reflectivity: f64,   // 0 for diffuse, higher values for reflective
-    pub transparency: f64,   // 0 for opaque, 1 for fully transparent
     pub emission: Rgb<f64>,  // Non-zero values make the material emissive
 }
 
@@ -39,11 +38,10 @@ impl Material for BaseMaterial {
 
 impl BaseMaterial {
     pub const DEFAULT: BaseMaterial = BaseMaterial {
-        transparency: 0.0,
         emission: Rgb([0.0, 0.0, 0.0]),
         reflectivity: 0.0
     };
-    
+
     fn reflected_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
         let reflected_direction = ray.reflect(hit.normal).direction;
         let reflected_ray = Ray::new(hit.position, reflected_direction);

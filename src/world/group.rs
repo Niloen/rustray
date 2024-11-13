@@ -28,7 +28,7 @@ impl<'a> Intersecting<'a> for Group<'a> {
         let mut shortest: f64 = f64::MAX;
         for object in self.objects.iter() {
             if let Some(intersection) = object.intersects(ray) {
-                if (intersection.distance < shortest) {
+                if intersection.distance < shortest {
                     shortest = intersection.distance;
                     result.replace(intersection);
                 }

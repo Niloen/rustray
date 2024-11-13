@@ -5,12 +5,12 @@ use image::Rgb;
 use crate::world::material::Material;
 
 impl<'a> Sphere<'a> {
-    pub fn new(center: Vector3, radius: f64, color: Rgb<f64>, material: &'a dyn Material) -> Sphere<'a> {
+    pub fn new(center: Vector3, radius: f64, color: Rgb<f64>, material: impl Material + 'a) -> Sphere<'a> {
         Sphere {
             center,
             radius,
             color,
-            material
+            material: Box::new(material)
         }
     }
 
@@ -57,7 +57,7 @@ impl<'a> Object<'a> for Sphere<'a> {
                 color: self.color,
                 position,
                 normal: (position - self.center).normalize(),
-                material: self.material,
+                material: self.material.as_ref()
             }
         })
     }
@@ -67,5 +67,5 @@ pub struct Sphere<'a> {
     center: Vector3,
     radius: f64,
     color: Rgb<f64>,
-    material: &'a dyn Material,
+    material: Box<dyn Material + 'a>
 }

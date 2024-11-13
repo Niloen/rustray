@@ -20,10 +20,6 @@ impl Light {
         return Ray::new(position, position - self.ray.origin)
     }
     
-    pub fn distance_to(&self, position: Vector3) -> f64 {
-        (position - self.ray.origin).length()
-    }
-    
     pub fn illuminate(&self, position: Vector3, normal: Vector3) -> Rgb<f64> {
         let mut fraction = self.towards(position).direction.cos_angle(normal).neg();
         if fraction < 0.0 {

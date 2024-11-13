@@ -1,11 +1,11 @@
-use image::{Pixel, Rgb};
 pub use crate::world::cast::RayCaster;
 use crate::world::group::Group;
 pub use crate::world::light::Light;
-use crate::world::object::{HitResult, Intersecting};
+pub use crate::world::material::{BaseMaterial, Material};
 pub use crate::world::object::Object;
+use crate::world::object::Intersecting;
 use crate::world::ray::Ray;
-pub use crate::world::material::{Material, BaseMaterial};
+use image::{Pixel, Rgb};
 
 pub mod ray;
 mod object;

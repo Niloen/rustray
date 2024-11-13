@@ -3,7 +3,7 @@ extern crate image;
 use crate::vector::Vector3;
 use crate::world::RayCaster;
 use crate::world::ray::Ray;
-use image::{Rgb, RgbImage, Pixel};
+use image::{Rgb, RgbImage};
 
 pub struct Camera {
     base: Ray,

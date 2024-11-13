@@ -28,22 +28,21 @@ fn generate_image(width: u32, height: u32, tx: impl Fn((u32, u32, Rgb<u8>)) + Se
     println!("Generated image");
 }
 
-const MAT: BaseMaterial = BaseMaterial::DEFAULT;
-const MIRROR: BaseMaterial = BaseMaterial {
-    reflectivity: 1.0,
-    ..MAT
-};
-
 fn create_world<'a>() -> World<'a> {
+    const MAT: BaseMaterial = BaseMaterial::DEFAULT;
+    const MIRROR: BaseMaterial = BaseMaterial {
+        reflectivity: 1.0,
+        ..MAT
+    };
     
     let mut world = World::new();
     world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([1.0, 1.0, 1.0])));
     world.add_light(Light::new(Ray::new(Vector3::new(-100.0, 0.0, 80.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([0.0, 0.0, 1.0])));
-    world.add(Sphere::new(Vector3::new(0.0, 25.0, 100.0), 20.0, Rgb([1.0, 1.0, 1.0]), &MAT));
+    world.add(Sphere::new(Vector3::new(0.0, 25.0, 100.0), 20.0, Rgb([1.0, 1.0, 1.0]), MAT));
     for i in 1..=1000 {
         let ifl = i as f64;
 
-        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([1.0, 1.0, 1.0]), &MIRROR));
+        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([1.0, 1.0, 1.0]), MIRROR));
     }
     world
 }
