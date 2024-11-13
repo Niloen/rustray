@@ -34,15 +34,21 @@ fn create_world<'a>() -> World<'a> {
         reflectivity: 1.0,
         ..MAT
     };
-    
+
+    let mat = BaseMaterial {
+        emission: Rgb([0.0, 0.0, 0.0]),
+        reflectivity: 0.1,
+    };
     let mut world = World::new();
+    world.add(Sphere::new(Vector3::new(0.0, 25.0, 100.0), 20.0, Rgb([1.0, 1.0, 1.0]), &mat));
+    world.add(Sphere::new(Vector3::new(0.0, 25.0, 100.0), 20.0, Rgb([1.0, 1.0, 1.0]), &mat));
     world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([1.0, 1.0, 1.0])));
     world.add_light(Light::new(Ray::new(Vector3::new(-100.0, 0.0, 80.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([0.0, 0.0, 1.0])));
-    world.add(Sphere::new(Vector3::new(0.0, 25.0, 100.0), 20.0, Rgb([1.0, 1.0, 1.0]), MAT));
+    world.add(Sphere::new(Vector3::new(0.0, 25.0, 100.0), 20.0, Rgb([1.0, 1.0, 1.0]), &MAT));
     for i in 1..=1000 {
         let ifl = i as f64;
 
-        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([1.0, 1.0, 1.0]), MIRROR));
+        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([1.0, 1.0, 1.0]), &MIRROR));
     }
     world
 }

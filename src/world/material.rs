@@ -8,6 +8,7 @@ pub trait Material: Send + Sync + Debug {
     /// Calculates the color for the material at an intersection point.
     /// Takes the ray that hit the object, the hit result, the ray caster function, and the recursion depth.
     fn shade(&self, ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64>;
+    fn clone_box(&self) -> Box<dyn Material>;
 }
 
 #[derive(Debug, Clone)]
@@ -33,6 +34,10 @@ impl Material for BaseMaterial {
         color = color.map2(&self.emission, |c1, c2| c1 + c2);
 
         color
+    }
+
+    fn clone_box(&self) -> Box<dyn Material> {
+        Box::new(self.clone())
     }
 }
 

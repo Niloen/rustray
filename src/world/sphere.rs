@@ -5,12 +5,12 @@ use image::Rgb;
 use crate::world::material::Material;
 
 impl<'a> Sphere<'a> {
-    pub fn new(center: Vector3, radius: f64, color: Rgb<f64>, material: impl Material + 'a) -> Sphere<'a> {
+    pub fn new(center: Vector3, radius: f64, color: Rgb<f64>, material: &dyn Material) -> Sphere<'a> {
         Sphere {
             center,
             radius,
             color,
-            material: Box::new(material)
+            material: material.clone_box()
         }
     }
 
