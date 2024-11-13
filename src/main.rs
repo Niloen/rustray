@@ -65,7 +65,7 @@ fn create_world2<'a>() -> World<'a> {
     world.add(Sphere::new(Vector3::new(0.0, 0.0, 100.0), 20.0, white, &mirror));
     world.add(Sphere::new(Vector3::new(200.0, 0.0, 100.0), 100.0, Rgb([1.0, 0.0, 0.0]), &mat));
     //world.add(Sphere::new(Vector3::new(-50.0, -50.0, 100.0), 50.0, Rgb([0.0, 1.0, 0.0]), &mat));
-    world.add(Cube::new(Vector3::new(-50.0, -50.0, 100.0), 50.0, Rgb([0.0, 1.0, 0.0]), &mat));
+    world.add(Cube::new(Vector3::new(-50.0, -25.0, 75.0), 25.0, Rgb([0.0, 1.0, 0.0]), &mat));
     world
 }
 
