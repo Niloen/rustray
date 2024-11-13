@@ -1,6 +1,7 @@
 use std::thread;
+use std::thread::yield_now;
 use async_channel::Sender;
-use gtk4::{glib, Align, Application, ApplicationWindow, Label, Orientation, Picture};
+use gtk4::{gio, glib, Align, Application, ApplicationWindow, Label, Orientation, Picture};
 use gtk4::gdk_pixbuf::{Colorspace, Pixbuf};
 use gtk4::prelude::*;
 use image::Rgb;
@@ -39,10 +40,10 @@ pub fn show(width: i32, height: i32, f: impl Fn(Sender<ShowPixelMessage>) + Copy
         window.set_child(Some(&container));
         window.present();
 
-        glib::MainContext::default().spawn_local(async move {
+        glib::spawn_future_local(async move {
             let (tx, rx) = async_channel::unbounded::<(u32, u32, Rgb<u8>)>();
 
-            thread::spawn(move || {
+            gio::spawn_blocking(move || {
                 f(tx)
             });
 
