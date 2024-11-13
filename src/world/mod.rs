@@ -40,13 +40,6 @@ impl<'a> World<'a> {
         self.lights.push(light);
     }
 
-    fn illumination(&self, normal_ray: &Ray) -> Rgb<f64> {
-        self.lights.iter()
-            .map(|light| {
-                light.illuminate(normal_ray.origin, normal_ray.direction)
-            }).reduce(|c1,c2|c1.map2(&c2, |x1,x2|min(1.0, x1 + x2)))
-            .unwrap_or_else(|| Rgb([0.0, 0.0, 0.0]))
-    }
 }
 
 impl<'a> RayCaster for World<'a> {
@@ -58,13 +51,15 @@ impl<'a> RayCaster for World<'a> {
         
         self.root.intersects(ray)
             .and_then(|i| i.object.hit(ray))
-            .map(|hr| {
-                let normal_ray = Ray::new(ray.at(hr.distance), hr.normal);
-                
-                let color = hr.material.shade(ray, &hr, self, depth);
-                
-                self.illumination(&normal_ray).map2(&color, |c1, c2| c1 * c2)
-            })
+            .map(|hr| hr.material.shade(ray, &hr, self, depth))
             .unwrap_or(Rgb([0.0, 0.0, 0.0]))
+    }
+
+    fn direct_lightning(&self, normal_ray: &Ray) -> Rgb<f64> {
+        self.lights.iter()
+            .map(|light| {
+                light.illuminate(normal_ray.origin, normal_ray.direction)
+            }).reduce(|c1,c2|c1.map2(&c2, |x1,x2|min(1.0, x1 + x2)))
+            .unwrap_or_else(|| Rgb([0.0, 0.0, 0.0]))
     }
 }

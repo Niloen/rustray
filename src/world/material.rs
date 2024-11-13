@@ -20,8 +20,15 @@ pub struct BaseMaterial {
 impl Material for BaseMaterial {
     fn shade(&self, ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
         // Basic shading logic with adjustable parameters
-        let mut color = hit.color;
 
+        let mut color = if self.reflectivity < 1.0 {
+            caster.direct_lightning(&Ray::new(hit.position, hit.normal))
+                .map(|c| c * (1.0 - self.reflectivity))
+                .map2(&hit.color, |c1, c2|c1 * c2)
+        } else {
+            Rgb([0.0, 0.0, 0.0]) // Skip diffuse lighting for fully reflective surfaces
+        };
+        
         // Reflection
         if self.reflectivity > 0.0 && depth > 0 {
             let reflected_color = Self::reflected_color(ray, hit, caster, depth);

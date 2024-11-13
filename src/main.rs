@@ -49,7 +49,7 @@ fn create_world1<'a>() -> World<'a> {
 fn create_world2<'a>() -> World<'a> {
     let mat: BaseMaterial = BaseMaterial::DEFAULT;
     let mirror: BaseMaterial = BaseMaterial {
-        reflectivity: 0.9,
+        reflectivity: 0.7,
         ..mat
     };
 
@@ -62,7 +62,7 @@ fn create_world2<'a>() -> World<'a> {
     let mut world = World::new();
     world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), white));
     world.add(Sphere::new(Vector3::new(0.0, 0.0, 100.0), 20.0, white, &mirror));
-    world.add(Sphere::new(Vector3::new(200.0, 0.0, 100.0), 100.0, Rgb([1.0, 0.0, 0.0]), &em));
+    world.add(Sphere::new(Vector3::new(200.0, 0.0, 100.0), 100.0, Rgb([1.0, 0.0, 0.0]), &mat));
     world
 }
 
