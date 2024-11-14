@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Index, Mul, Sub};
+use std::ops::{Add, Div, Index, Mul, Neg, Sub};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub(crate) struct Vector3 {
@@ -119,5 +119,13 @@ impl Div<f64> for Vector3 {
 
     fn div(self, rhs: f64) -> Self::Output {
         Vector3::div(&self, rhs)
+    }
+}
+
+impl Neg for Vector3 {
+    type Output = Vector3;
+
+    fn neg(self) -> Vector3 {
+        Vector3::new(-self.x, -self.y, -self.z)
     }
 }

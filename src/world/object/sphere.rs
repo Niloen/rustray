@@ -24,17 +24,29 @@ impl<'a> Sphere<'a> {
         let mut t0 = tca - thc;
         let mut t1 = tca + thc;
 
+        let is_inside_sphere = l.length() < self.radius;
+        
         if t0 > t1 {
             std::mem::swap(&mut t0, &mut t1);
         }
 
-        if t0 < 0.0 {
-            t0 = t1; // If t0 is negative, let's use t1 instead.
-            if t0 < 0.0 {
-                return None; // Both t0 and t1 are negative.
+        if is_inside_sphere {
+            // If inside the sphere, take the exit point `t1`
+            if t1 >= 0.0 {
+                Some(t1)
+            } else {
+                None // No valid intersection if `t1` is negative
             }
+        } else {
+            // Standard logic for rays originating outside the sphere
+            if t0 < 0.0 {
+                t0 = t1; // If t0 is negative, let's use t1 instead
+                if t0 < 0.0 {
+                    return None; // Both t0 and t1 are negative
+                }
+            }
+            Some(t0)
         }
-        Some(t0)
     }
 
     fn texture_coords(&self, hit_position: &Vector3) -> TextureCoords {

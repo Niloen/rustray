@@ -15,6 +15,7 @@ pub trait Material: Send + Sync + Debug {
 pub struct BaseMaterial {
     pub reflectivity: f64,   // 0 for diffuse, higher values for reflective
     pub emission: Rgb<f64>,  // Non-zero values make the material emissive
+    pub refractive: f64
 }
 
 impl Material for BaseMaterial {
@@ -37,6 +38,11 @@ impl Material for BaseMaterial {
                 c1 * (1.0 - self.reflectivity) + c2 * self.reflectivity);
         }
 
+        if self.refractive > 1.0 && depth > 0 {
+            let refracted_color = Self::refracted_color(ray, hit, caster, depth, self.refractive);
+            color = color.map2(&refracted_color, |c1, c2| c1 + c2 * (1.0 - self.reflectivity));
+        }
+
         // Emission
         color = color.map2(&self.emission, |c1, c2| c1 + c2);
 
@@ -51,7 +57,8 @@ impl Material for BaseMaterial {
 impl BaseMaterial {
     pub const DEFAULT: BaseMaterial = BaseMaterial {
         emission: Rgb([0.0, 0.0, 0.0]),
-        reflectivity: 0.0
+        reflectivity: 0.0,
+        refractive: 1.0
     };
 
     fn reflected_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
@@ -60,5 +67,31 @@ impl BaseMaterial {
         let reflected_ray = Ray::new(hit.position + hit.normal * 0.000001, reflected_direction);
         let reflected_color = caster.cast(&reflected_ray, depth - 1);
         reflected_color
+    }
+
+    fn refracted_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32, refractive_index: f64) -> Rgb<f64> {
+        let n1 = 1.0; // Assuming ray originates in air with refractive index 1.0
+        let n2 = refractive_index;
+
+        let cos_i = -hit.normal.dot(&ray.direction).max(-1.0).min(1.0);
+        let (n1, n2, normal) = if cos_i < 0.0 {
+            // Inside the material; flip normal
+            (n2, n1, -hit.normal)
+        } else {
+            (n1, n2, hit.normal)
+        };
+
+        let eta = n1 / n2;
+        let sin_t2 = eta * eta * (1.0 - cos_i * cos_i);
+
+        if sin_t2 > 1.0 {
+            // Total internal reflection
+            return Rgb([0.0, 0.0, 0.0]);
+        }
+
+        let cos_t = (1.0 - sin_t2).sqrt();
+        let refracted_direction = ray.direction * eta + normal * (eta * cos_i - cos_t);
+        let refracted_ray = Ray::new(hit.position - hit.normal * 0.000001, refracted_direction);
+        caster.cast(&refracted_ray, depth - 1)
     }
 }

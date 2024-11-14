@@ -54,7 +54,7 @@ impl Camera {
         let ray = self.ray_at((x,y));        
 
         let color = caster.cast(&ray, 5);
-        
+
         Rgb(color.0.map(|x| (x * 255.0) as u8))
     }
     
