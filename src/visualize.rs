@@ -54,8 +54,8 @@ impl Processor {
                 self.flush_pixels();
             }
             ShowMessage::ShowImage(image) => {
-                image.enumerate_pixels().for_each(|(x, y, Rgb([r, g, b]))| {
-                    self.pixbuf.put_pixel(x, y, *r, *g, *b, 0);
+                image.enumerate_pixels().for_each(|(x, y, c)| {
+                    self.put_pixel(x, y, *c);
                 });
                 self.flush_pixels();
             }
@@ -63,7 +63,7 @@ impl Processor {
     }
     
     fn flush_pixels(&mut self) {
-        if (self.dirty) {
+        if self.dirty {
             self.dirty = false;
             self.picture.set_pixbuf(Some(&self.pixbuf));
         }
