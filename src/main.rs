@@ -103,7 +103,7 @@ fn main() {
     } else {
         let world = create_world(0);
         let image = generate_image(&world, width, height, |_m| {});
-        image.save("output.png").unwrap();
+        image.save("../example.png").unwrap();
 
         println!("Generated image");
     }
