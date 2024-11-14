@@ -1,16 +1,15 @@
 use crate::vector::Vector3;
-use crate::world::object::{HitResult, Intersecting, Intersection, Object};
+use crate::world::object::{HitResult, Object};
 use crate::world::ray::Ray;
-use image::Rgb;
-use crate::world::material::Material;
+use crate::world::intersect::{Intersecting, Intersection};
+use crate::world::texture::{Texture, TextureCoords};
 
 impl<'a> Sphere<'a> {
-    pub fn new(center: Vector3, radius: f64, color: Rgb<f64>, material: &dyn Material) -> Sphere<'a> {
+    pub fn new(center: Vector3, radius: f64, texture: &dyn Texture<'a>) -> Sphere<'a> {
         Sphere {
             center,
             radius,
-            color,
-            material: material.clone_box()
+            texture: texture.clone_box()
         }
     }
 
@@ -37,6 +36,13 @@ impl<'a> Sphere<'a> {
         }
         Some(t0)
     }
+
+    fn texture_coords(&self, hit_position: &Vector3) -> TextureCoords {
+        let local_point = (*hit_position - self.center).normalize();
+        let u = 0.5 + (local_point.z.atan2(local_point.x) / (2.0 * std::f64::consts::PI));
+        let v = 0.5 - (local_point.y.asin() / std::f64::consts::PI);
+        (u, v)
+    }
 }
 impl<'a> Intersecting<'a> for Sphere<'a> {
     fn intersects<'b, 'z>(&'b self, ray: &Ray) -> Option<Intersection<'z, 'a>>
@@ -52,19 +58,17 @@ impl<'a> Object<'a> for Sphere<'a> {
     fn hit(&self, ray: &Ray) -> Option<HitResult> {
         return self.distance(ray).map(|t0| {
             let position = ray.at(t0);
+            let normal = (position - self.center).normalize();
             HitResult {
-                color: self.color,
                 position,
-                normal: (position - self.center).normalize(),
-                material: self.material.as_ref()
+                normal,
+                surface: self.texture.surface_at(self.texture_coords(&position))
             }
         })
     }
 }
-#[derive(Debug)]
 pub struct Sphere<'a> {
     center: Vector3,
     radius: f64,
-    color: Rgb<f64>,
-    material: Box<dyn Material + 'a>
+    texture: Box<dyn Texture<'a> + 'a>
 }

@@ -3,18 +3,20 @@ use crate::world::group::Group;
 pub use crate::world::light::Light;
 pub use crate::world::material::{BaseMaterial, Material};
 pub use crate::world::object::Object;
-use crate::world::object::Intersecting;
+pub use crate::world::surface::Surface;
 use crate::world::ray::Ray;
 use image::{Pixel, Rgb};
+use intersect::Intersecting;
 
 pub mod ray;
-mod object;
-pub mod sphere;
+pub mod object;
 mod group;
 mod light;
 mod material;
 mod cast;
-pub mod cube;
+mod texture;
+mod surface;
+mod intersect;
 
 pub struct World<'a> {
     root: Group<'a>,
@@ -52,7 +54,7 @@ impl<'a> RayCaster for World<'a> {
         
         self.root.intersects(ray)
             .and_then(|i| i.object.hit(ray))
-            .map(|hr| hr.material.shade(ray, &hr, self, depth))
+            .map(|hr| hr.surface.material.shade(ray, &hr, self, depth))
             .unwrap_or(Rgb([0.0, 0.0, 0.0]))
     }
 
@@ -64,3 +66,4 @@ impl<'a> RayCaster for World<'a> {
             .unwrap_or_else(|| Rgb([0.0, 0.0, 0.0]))
     }
 }
+

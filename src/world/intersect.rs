@@ -1,14 +1,5 @@
-use image::Rgb;
-use crate::vector::Vector3;
-use crate::world::material::Material;
+use crate::world::Object;
 use crate::world::ray::Ray;
-#[derive(Debug)]
-pub struct HitResult<'a> {
-    pub position: Vector3,
-    pub normal: Vector3,
-    pub color: Rgb<f64>,
-    pub material: &'a dyn Material,
-}
 
 pub struct Intersection<'a, 'b> {
     pub distance: f64,
@@ -30,9 +21,3 @@ pub trait Intersecting<'a>: Send + Sync {
         'a: 'z,
         'b: 'z;
 }
-
-pub trait Object<'a>: Send + Sync + Intersecting<'a>{
-
-    fn hit(&self, ray: &Ray) -> Option<HitResult>;
-}
-

@@ -24,7 +24,7 @@ impl Material for BaseMaterial {
         let mut color = if self.reflectivity < 1.0 {
             caster.direct_lightning(&Ray::new(hit.position, hit.normal))
                 .map(|c| c * (1.0 - self.reflectivity))
-                .map2(&hit.color, |c1, c2|c1 * c2)
+                .map2(&hit.surface.color, |c1, c2|c1 * c2)
         } else {
             Rgb([0.0, 0.0, 0.0]) // Skip diffuse lighting for fully reflective surfaces
         };

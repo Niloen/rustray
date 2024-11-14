@@ -1,5 +1,5 @@
 use crate::world::Object;
-use crate::world::object::{Intersecting, Intersection};
+use crate::world::intersect::{Intersecting, Intersection};
 use crate::world::ray::Ray;
 
 pub struct Group<'a> {

@@ -2,11 +2,11 @@ use crate::camera::Camera;
 use crate::vector::Vector3;
 use crate::visualize::show;
 use crate::world::ray::Ray;
-use crate::world::sphere::Sphere;
-use crate::world::{BaseMaterial, Light, World};
+use crate::world::object::Sphere;
+use crate::world::{BaseMaterial, Light, Surface, World};
 use image::Rgb;
 use std::time::Instant;
-use crate::world::cube::Cube;
+use crate::world::object::Cube;
 
 mod world;
 mod vector;
@@ -39,11 +39,11 @@ fn create_world1<'a>() -> World<'a> {
     let mut world = World::new();
     world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([1.0, 1.0, 1.0])));
     world.add_light(Light::new(Ray::new(Vector3::new(-100.0, 0.0, 80.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([0.0, 0.0, 1.0])));
-    world.add(Sphere::new(Vector3::new(0.0, 25.0, 100.0), 20.0, Rgb([1.0, 1.0, 1.0]), &MAT));
+    world.add(Sphere::new(Vector3::new(0.0, 25.0, 100.0), 20.0, &Surface::new(Rgb([1.0, 1.0, 1.0]), &MAT)));
     for i in 1..=1000 {
         let ifl = i as f64;
 
-        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, Rgb([1.0, 1.0, 1.0]), &MAT));
+        world.add(Sphere::new(Vector3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, &Surface::new(Rgb([1.0, 1.0, 1.0]), &MAT)));
     }
     world
 }
@@ -61,8 +61,8 @@ fn create_world2<'a>() -> World<'a> {
     let mut world = World::new();
     world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), white));
     world.add_light(Light::new(Ray::new(Vector3::new(-10.0, -25.0, 200.0), Vector3::new(0.0, 0.0, -1.0)), Rgb([0.2, 0.2, 0.2])));
-    world.add(Sphere::new(Vector3::new(20.0, 20.0, 100.0), 20.0, white, &mirror));
-    world.add(Sphere::new(Vector3::new(200.0, 0.0, 100.0), 100.0, Rgb([1.0, 0.0, 0.0]), &mat));
+    world.add(Sphere::new(Vector3::new(20.0, 20.0, 100.0), 20.0, &Surface::new(white, &mirror)));
+    world.add(Sphere::new(Vector3::new(200.0, 0.0, 100.0), 100.0, &Surface::new(Rgb([1.0, 0.0, 0.0]), &mat)));
     //world.add(Sphere::new(Vector3::new(-50.0, -50.0, 100.0), 50.0, Rgb([0.0, 1.0, 0.0]), &mat));
     world.add(Cube::new(Vector3::new(-10.0, -25.0, 50.0), 20.0, Rgb([1.0, 1.0, 1.0]), &mat));
     world.add(Cube::new(Vector3::new(-50.0, -25.0, 120.0), 30.0, Rgb([1.0, 1.0, 0.0]), &mat));

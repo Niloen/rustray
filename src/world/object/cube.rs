@@ -1,8 +1,10 @@
 use crate::vector::Vector3;
-use crate::world::object::{HitResult, Intersecting, Intersection, Object};
+use crate::world::object::{HitResult, Object};
 use crate::world::ray::Ray;
 use crate::world::material::Material;
 use image::Rgb;
+use crate::world::intersect::{Intersecting, Intersection};
+use crate::world::surface::Surface;
 
 #[derive(Debug)]
 pub struct Cube<'a> {
@@ -84,10 +86,9 @@ impl<'a> Object<'a> for Cube<'a> {
         self.intersect_with_ray(ray).map(|distance| {
             let hit_position = ray.at(distance);
             HitResult {
-                color: self.color,
                 position: hit_position,
                 normal: self.normal_at(&hit_position),
-                material: self.material.as_ref(),
+                surface: Surface::new(self.color, self.material.as_ref()),
             }
         })
     }
