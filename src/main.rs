@@ -54,9 +54,14 @@ fn create_world2<'a>(frame: u32) -> World<'a> {
         ..mat
     };
 
+    let _refrac: BaseMaterial = BaseMaterial {
+        refractive: 1.2,
+        ..mat
+    };
     let white = Rgb([1.0, 1.0, 1.0]);
     let green = Rgb([0.0, 1.0, 0.0]);
     let blue = Rgb([0.0, 0.0, 1.0]);
+    let _black = Rgb([0.0, 0.0, 0.0]);
 
     let mut world = World::new();
 
@@ -98,6 +103,35 @@ fn create_world3<'a>(_frame: u32) -> World<'a> {
     world.add_light(Light::new(Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -1.0)), white));
     //world.add(Plane::new(Vector3::new(0.0, -100.0, 0.0), Vector3::new(0.0, 1.0, 0.0), &Surface::new(green, &mat)));
     world.add(Sphere::new(Vector3::new(20.0, 20.0, 100.0), 20.0, &Surface::new(white, &mat)));
+    world
+}
+
+#[allow(dead_code)]
+fn create_world4<'a>(_frame: u32) -> World<'a> {
+    let mat: BaseMaterial = BaseMaterial::DEFAULT;
+    let _mirror: BaseMaterial = BaseMaterial {
+        reflectivity: 0.9,
+        ..mat
+    };
+
+    let refrac: BaseMaterial = BaseMaterial {
+        refractive: 4.0,
+        ..mat
+    };
+
+    let white = Rgb([1.0, 1.0, 1.0]);
+    let green = Rgb([0.0, 1.0, 0.0]);
+    let blue = Rgb([0.0, 0.0, 1.0]);
+
+    let z = 200.0;
+
+    let checkerboard_texture1 = CheckerboardTexture::new(Surface::new(white, &mat), Surface::new(green, &mat), 0.01);
+
+    let mut world = World::new();
+
+    world.add_light(Light::new(Ray::new(Vector3::new(0.0, 0.0, z + 90.0), Vector3::new(0.0, 0.0, -1.0)), white));
+    world.add(Plane::new(Vector3::new(0.0, 0.0, z + 200.0), Vector3::new(0.0, 0.0, -1.0), &checkerboard_texture1));
+    world.add(Sphere::new(Vector3::new(0.0, 0.0, z), 60.0, &Surface::new(blue, &refrac)));
     world
 }
 

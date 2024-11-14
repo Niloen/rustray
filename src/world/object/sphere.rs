@@ -15,6 +15,10 @@ impl<'a> Sphere<'a> {
 
     fn distance(&self, ray: &Ray) -> Option<f64> {
         let l = self.center - ray.origin;
+        let is_inside_sphere = l.length() < self.radius;
+        if is_inside_sphere {
+            return None;
+        }
         let tca = l.dot(&ray.direction);
         let d2 = l.dot(&l) - tca * tca;
         if d2 > self.radius * self.radius {
@@ -24,29 +28,18 @@ impl<'a> Sphere<'a> {
         let mut t0 = tca - thc;
         let mut t1 = tca + thc;
 
-        let is_inside_sphere = l.length() < self.radius;
-        
         if t0 > t1 {
             std::mem::swap(&mut t0, &mut t1);
         }
 
-        if is_inside_sphere {
-            // If inside the sphere, take the exit point `t1`
-            if t1 >= 0.0 {
-                Some(t1)
-            } else {
-                None // No valid intersection if `t1` is negative
-            }
-        } else {
-            // Standard logic for rays originating outside the sphere
+        // Standard logic for rays originating outside the sphere
+        if t0 < 0.0 {
+            t0 = t1; // If t0 is negative, let's use t1 instead
             if t0 < 0.0 {
-                t0 = t1; // If t0 is negative, let's use t1 instead
-                if t0 < 0.0 {
-                    return None; // Both t0 and t1 are negative
-                }
+                return None; // Both t0 and t1 are negative
             }
-            Some(t0)
         }
+        Some(t0)
     }
 
     fn texture_coords(&self, hit_position: &Vector3) -> TextureCoords {
