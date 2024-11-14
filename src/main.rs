@@ -50,7 +50,7 @@ fn create_world1<'a>(_frame: u32) -> World<'a> {
 fn create_world2<'a>(frame: u32) -> World<'a> {
     let mat: BaseMaterial = BaseMaterial::DEFAULT;
     let mirror: BaseMaterial = BaseMaterial {
-        reflectivity: 0.9,
+        reflectivity: 0.7,
         ..mat
     };
 
@@ -72,7 +72,7 @@ fn create_world2<'a>(frame: u32) -> World<'a> {
     world.add(Plane::new(Vector3::new(0.0, 150.0, z + 0.0), Vector3::new(0.0, -1.0, 0.0), &checkerboard_texture2));
 
     world.add(Sphere::new(Vector3::new(20.0, 20.0, z + 100.0), 20.0, &Surface::new(white, &mirror)));
-    world.add(Sphere::new(Vector3::new(-100.0 + 2.0 * frame as f64, 20.0, z + 75.0), 40.0, &Surface::new(white, &mirror)));
+    world.add(Sphere::new(Vector3::new(-50.0 + 4.0 * frame as f64, 20.0, z + 75.0), 40.0, &Surface::new(white, &mirror)));
     world.add(Sphere::new(Vector3::new(200.0, 0.0, z + 100.0), 100.0, &Surface::new(Rgb([1.0, 0.0, 0.0]), &mat)));
     //world.add(Sphere::new(Vector3::new(-50.0, -50.0, 100.0), 50.0, Rgb([0.0, 1.0, 0.0]), &mat));
     world.add(Cube::new(Vector3::new(-10.0, -25.0, z + 50.0), 20.0, Rgb([0.0, 0.0, 1.0]), &mat));
