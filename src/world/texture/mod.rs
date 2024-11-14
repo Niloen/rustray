@@ -11,7 +11,7 @@ pub trait Texture<'a>: Send + Sync {
     fn clone_box(&self) -> Box<dyn Texture<'a> + 'a>;
 }
 
-impl<'a> Texture<'a> for Surface<'a> {
+impl<'a> Texture<'a> for Surface {
     fn surface_at(&self, _coords: TextureCoords) -> Surface {
         self.clone()
     }

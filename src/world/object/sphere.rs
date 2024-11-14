@@ -15,8 +15,8 @@ impl<'a> Sphere<'a> {
 
     fn distance(&self, ray: &Ray) -> Option<f64> {
         let l = self.center - ray.origin;
-        let tca = l.dot(ray.direction);
-        let d2 = l.dot(l) - tca * tca;
+        let tca = l.dot(&ray.direction);
+        let d2 = l.dot(&l) - tca * tca;
         if d2 > self.radius * self.radius {
             return None;
         }

@@ -40,7 +40,7 @@ impl Vector3 {
         }
     }
     
-    fn add(&self, v: Vector3) -> Vector3 {
+    fn add(&self, v: &Vector3) -> Vector3 {
         Vector3 {
             x: self.x + v.x,
             y: self.y + v.y,
@@ -56,7 +56,7 @@ impl Vector3 {
         }
     }
 
-    pub fn sub(&self, v: Vector3) -> Vector3 {
+    pub fn sub(&self, v: &Vector3) -> Vector3 {
         Vector3 {
             x: self.x - v.x,
             y: self.y - v.y,
@@ -64,7 +64,7 @@ impl Vector3 {
         }
     }
 
-    pub fn dot(&self, v: Vector3) -> f64 {
+    pub fn dot(&self, v: &Vector3) -> f64 {
         self.x * v.x + self.y * v.y + self.z * v.z
     }
 
@@ -75,15 +75,26 @@ impl Vector3 {
         self.div(self.length())
     }
     
-    pub fn cos_angle(&self, v: Vector3) -> f64 {
+    pub fn cos_angle(&self, v: &Vector3) -> f64 {
         self.dot(v).div(self.length() * v.length())
+    }
+
+    pub fn perpendicular(&self) -> Vector3 {
+        // Choose the axis with the smallest absolute component to avoid near-parallelism
+        if self.x.abs() < self.y.abs() && self.x.abs() < self.z.abs() {
+            Vector3::new(1.0, 0.0, 0.0).cross(self).normalize()
+        } else if self.y.abs() < self.z.abs() {
+            Vector3::new(0.0, 1.0, 0.0).cross(self).normalize()
+        } else {
+            Vector3::new(0.0, 0.0, 1.0).cross(self).normalize()
+        }
     }
 }
 impl Add<Vector3> for Vector3 {
     type Output = Vector3;
 
     fn add(self, rhs: Vector3) -> Self::Output {
-        Vector3::add(&self, rhs)
+        Vector3::add(&self, &rhs)
     }
 }
 
@@ -91,7 +102,7 @@ impl Sub<Vector3> for Vector3 {
     type Output = Vector3;
 
     fn sub(self, rhs: Vector3) -> Self::Output {
-        Vector3::sub(&self, rhs)
+        Vector3::sub(&self, &rhs)
     }
 }
 

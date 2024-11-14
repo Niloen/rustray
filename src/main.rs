@@ -2,7 +2,7 @@ use crate::camera::Camera;
 use crate::vector::Vector3;
 use crate::visualize::show;
 use crate::world::ray::Ray;
-use crate::world::object::Sphere;
+use crate::world::object::{Plane, Sphere};
 use crate::world::{BaseMaterial, Light, Surface, World};
 use image::Rgb;
 use std::time::Instant;
@@ -52,23 +52,34 @@ fn create_world1<'a>() -> World<'a> {
 fn create_world2<'a>() -> World<'a> {
     let mat: BaseMaterial = BaseMaterial::DEFAULT;
     let mirror: BaseMaterial = BaseMaterial {
-        reflectivity: 0.5,
-        emission: Rgb([0.3, 0.3, 0.3]),
+        reflectivity: 0.9,
         ..mat
     };
 
     let white = Rgb([1.0, 1.0, 1.0]);
-    let green = Rgb([1.0, 0.0, 0.0]);
+    let green = Rgb([0.0, 1.0, 0.0]);
+    let blue = Rgb([0.0, 0.0, 1.0]);
 
     let mut world = World::new();
-    world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), white));
-    world.add_light(Light::new(Ray::new(Vector3::new(-10.0, -25.0, 200.0), Vector3::new(0.0, 0.0, -1.0)), Rgb([0.2, 0.2, 0.2])));
-    world.add(Sphere::new(Vector3::new(20.0, 20.0, 100.0), 20.0, &CheckerboardTexture::new(Surface::new(white, &mirror), Surface::new(green, &mat), 20.0)));
-    world.add(Sphere::new(Vector3::new(200.0, 0.0, 100.0), 100.0, &Surface::new(Rgb([1.0, 0.0, 0.0]), &mat)));
+
+    let z = 200.0;
+
+    world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, z + 100.0), Vector3::new(0.0, -1.0, 0.0)), white));
+    world.add_light(Light::new(Ray::new(Vector3::new(-10.0, -25.0, z + 200.0), Vector3::new(0.0, 0.0, -1.0)), Rgb([0.2, 0.2, 0.2])));
+
+    let checkerboard_texture1 = CheckerboardTexture::new(Surface::new(white, &mat), Surface::new(green, &mat), 0.01);
+    let checkerboard_texture2 = CheckerboardTexture::new(Surface::new(white, &mat), Surface::new(blue, &mat), 0.01);
+
+    world.add(Plane::new(Vector3::new(0.0, -100.0, z + 0.0), Vector3::new(0.0, 1.0, 0.0), &checkerboard_texture1));
+    world.add(Plane::new(Vector3::new(0.0, 150.0, z + 0.0), Vector3::new(0.0, -1.0, 0.0), &checkerboard_texture2));
+
+    world.add(Sphere::new(Vector3::new(20.0, 20.0, z + 100.0), 20.0, &Surface::new(white, &mirror)));
+    world.add(Sphere::new(Vector3::new(-100.0, 20.0, z + 75.0), 40.0, &Surface::new(white, &mirror)));
+    world.add(Sphere::new(Vector3::new(200.0, 0.0, z + 100.0), 100.0, &Surface::new(Rgb([1.0, 0.0, 0.0]), &mat)));
     //world.add(Sphere::new(Vector3::new(-50.0, -50.0, 100.0), 50.0, Rgb([0.0, 1.0, 0.0]), &mat));
-    world.add(Cube::new(Vector3::new(-10.0, -25.0, 50.0), 20.0, Rgb([1.0, 1.0, 1.0]), &mat));
-    world.add(Cube::new(Vector3::new(-50.0, -25.0, 120.0), 30.0, Rgb([1.0, 1.0, 0.0]), &mat));
-    world.add(Cube::new(Vector3::new(0.0, -20.0, 300.0), 100.0, Rgb([1.0, 1.0, 1.0]), &mirror));
+    world.add(Cube::new(Vector3::new(-10.0, -25.0, z + 50.0), 20.0, Rgb([0.0, 0.0, 1.0]), &mat));
+    world.add(Cube::new(Vector3::new(-50.0, -25.0, z + 120.0), 30.0, Rgb([1.0, 1.0, 0.0]), &mat));
+    world.add(Cube::new(Vector3::new(0.0, -20.0, z + 300.0), 100.0, white, &mirror));
     world
 }
 

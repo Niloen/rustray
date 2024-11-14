@@ -2,20 +2,20 @@ use crate::world::surface::Surface;
 use crate::world::texture::{Texture, TextureCoords};
 
 #[derive(Clone)]
-pub struct CheckerboardTexture<'a> {
-    surface1: Surface<'a>,
-    surface2: Surface<'a>,
+pub struct CheckerboardTexture {
+    surface1: Surface,
+    surface2: Surface,
     scale: f64, // Number of checkers per unit area
 }
 
-impl<'a> CheckerboardTexture<'a> {
-    pub fn new(surface1: Surface<'a>, surface2: Surface<'a>, scale: f64) -> Self {
+impl CheckerboardTexture {
+    pub fn new(surface1: Surface, surface2: Surface, scale: f64) -> Self {
         Self { surface1, surface2, scale }
     }
 }
 
-impl<'a> Texture<'a> for CheckerboardTexture<'a> {
-    fn surface_at(&self, coords: TextureCoords) -> Surface<'a> {
+impl<'a> Texture<'a> for CheckerboardTexture {
+    fn surface_at(&self, coords: TextureCoords) -> Surface {
         let (u, v) = coords;
         let checker = ((u * self.scale).floor() + (v * self.scale).floor()) as i32;
         if checker % 2 == 0 {

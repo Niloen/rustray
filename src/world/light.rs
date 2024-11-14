@@ -21,7 +21,7 @@ impl Light {
     }
     
     pub fn illuminate(&self, position: Vector3, normal: Vector3) -> Rgb<f64> {
-        let mut fraction = self.towards(position).direction.cos_angle(normal).neg();
+        let mut fraction = self.towards(position).direction.cos_angle(&normal).neg();
         if fraction < 0.0 {
             fraction = 0.0
         }

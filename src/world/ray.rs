@@ -19,7 +19,7 @@ impl Ray {
 
     /// Calculates the reflected ray given a normal vector at the intersection point.
     pub fn reflect(&self, normal: Vector3) -> Ray {
-        let reflected_direction = self.direction - normal * 2.0 * self.direction.dot(normal);
+        let reflected_direction = self.direction - normal * 2.0 * self.direction.dot(&normal);
         Ray::new(self.origin, reflected_direction)
     }    
 }
