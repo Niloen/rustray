@@ -1,6 +1,6 @@
 # Ray tracing in Rust
 
-This is a ray tracer written in rust. It was written as a side project to experiment with ray tracing and rust.
+This is a ray tracer written in Rust. It was written as a side project to experiment with ray tracing and Rust.
 
 ![Ray tracing image](example.png)
 
