@@ -14,7 +14,7 @@ mod group;
 mod light;
 mod material;
 mod cast;
-mod texture;
+pub mod texture;
 mod surface;
 mod intersect;
 

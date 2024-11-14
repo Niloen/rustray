@@ -1,7 +1,7 @@
 mod checkerboard;
+pub use checkerboard::CheckerboardTexture;
 
 use crate::world::surface::Surface;
-
 pub type TextureCoords = (f64, f64);
 
 pub trait Texture<'a>: Send + Sync {
