@@ -6,6 +6,7 @@ use crate::world::object::{Plane, Sphere};
 use crate::world::{BaseMaterial, Light, Surface, World};
 use image::Rgb;
 use std::time::Instant;
+use crate::visualize::ShowMessage::ShowPixelMessage;
 use crate::world::object::Cube;
 use crate::world::texture::CheckerboardTexture;
 
@@ -89,7 +90,7 @@ fn main() {
     let height: u32 = 1920;
     if visualize {
         show(width as i32, height as i32, move |tx| {
-            generate_image(width, height, |m|tx.send_blocking(m).unwrap());
+            generate_image(width, height, |(x, y, c)|tx.send_blocking(ShowPixelMessage(x, y, c)).unwrap());
         })
     } else {
         generate_image(width, height, |_m| {})
