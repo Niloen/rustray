@@ -1,4 +1,3 @@
-use std::ops::Neg;
 use image::{Pixel, Rgb};
 use crate::vector::Vector3;
 use crate::world::ray::Ray;
@@ -17,11 +16,19 @@ impl Light {
     }
     
     pub fn towards(&self, position: Vector3) -> Ray {
-        return Ray::new(position, position - self.ray.origin)
+        Ray::new(position, self.towards_direction(position))
+    }
+    
+    pub fn towards_direction(&self, position: Vector3) -> Vector3 {
+        self.ray.origin - position
+    }
+    
+    pub fn distance_to(&self, position: Vector3) -> f64 {
+        return self.towards_direction(position).length()
     }
     
     pub fn illuminate(&self, position: Vector3, normal: Vector3) -> Rgb<f64> {
-        let mut fraction = self.towards(position).direction.cos_angle(&normal).neg();
+        let mut fraction = self.towards(position).direction.cos_angle(&normal);
         if fraction < 0.0 {
             fraction = 0.0
         }

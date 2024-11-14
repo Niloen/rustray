@@ -7,6 +7,8 @@ pub use crate::world::surface::Surface;
 use crate::world::ray::Ray;
 use image::{Pixel, Rgb};
 use intersect::Intersecting;
+use crate::vector::Vector3;
+use crate::world::intersect::Intersection;
 
 pub mod ray;
 pub mod object;
@@ -51,8 +53,9 @@ impl<'a> RayCaster for World<'a> {
         if depth == 0 {
             return Rgb([0.0, 0.0, 0.0]);
         }
-        
-        self.root.intersects(ray)
+
+        let intersection = self.cast_intersection(ray);
+        intersection
             .and_then(|i| i.object.hit(ray))
             .map(|hr| hr.surface.material.shade(ray, &hr, self, depth))
             .unwrap_or(Rgb([0.0, 0.0, 0.0]))
@@ -60,10 +63,33 @@ impl<'a> RayCaster for World<'a> {
 
     fn direct_lightning(&self, normal_ray: &Ray) -> Rgb<f64> {
         self.lights.iter()
+            .filter(|light| {
+                !self.is_shadowed(normal_ray.at(41.0), light)
+            })
             .map(|light| {
                 light.illuminate(normal_ray.origin, normal_ray.direction)
             }).reduce(|c1,c2|c1.map2(&c2, |x1,x2|min(1.0, x1 + x2)))
             .unwrap_or_else(|| Rgb([0.0, 0.0, 0.0]))
+    }
+}
+
+impl<'a> World<'a> {
+    fn is_shadowed(&self, position: Vector3, light: &Light) -> bool {
+        self.is_something_within_distance(&light.towards(position), light.distance_to(position))
+    }
+}
+
+impl<'a> World<'a> {
+    fn is_something_within_distance(&self, ray: &Ray, distance: f64) -> bool {
+        self.cast_intersection(&ray).filter(|i| {
+            i.distance < distance
+        }).is_some()
+    }
+}
+
+impl<'a> World<'a> {
+    fn cast_intersection<'b>(&'b self, ray: &Ray) -> Option<Intersection<'b, 'a>> {
+        self.root.intersects(ray)
     }
 }
 

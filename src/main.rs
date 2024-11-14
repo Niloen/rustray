@@ -46,6 +46,7 @@ fn create_world1<'a>(_frame: u32) -> World<'a> {
     world
 }
 
+#[allow(dead_code)]
 fn create_world2<'a>(frame: u32) -> World<'a> {
     let mat: BaseMaterial = BaseMaterial::DEFAULT;
     let mirror: BaseMaterial = BaseMaterial {
@@ -61,8 +62,8 @@ fn create_world2<'a>(frame: u32) -> World<'a> {
 
     let z = 200.0;
 
-    world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, z + 100.0), Vector3::new(0.0, -1.0, 0.0)), white));
-    world.add_light(Light::new(Ray::new(Vector3::new(-10.0, -25.0, z + 200.0), Vector3::new(0.0, 0.0, -1.0)), Rgb([0.2, 0.2, 0.2])));
+    world.add_light(Light::new(Ray::new(Vector3::new(0.0, 100.0, z), Vector3::new(0.0, -1.0, 0.0)), white));
+    world.add_light(Light::new(Ray::new(Vector3::new(-10.0, -25.0, z), Vector3::new(0.0, 0.0, -1.0)), Rgb([0.2, 0.2, 0.2])));
 
     let checkerboard_texture1 = CheckerboardTexture::new(Surface::new(white, &mat), Surface::new(green, &mat), 0.01);
     let checkerboard_texture2 = CheckerboardTexture::new(Surface::new(white, &mat), Surface::new(blue, &mat), 0.01);
@@ -77,6 +78,26 @@ fn create_world2<'a>(frame: u32) -> World<'a> {
     world.add(Cube::new(Vector3::new(-10.0, -25.0, z + 50.0), 20.0, Rgb([0.0, 0.0, 1.0]), &mat));
     world.add(Cube::new(Vector3::new(-50.0, -25.0, z + 120.0), 30.0, Rgb([1.0, 1.0, 0.0]), &mat));
     world.add(Cube::new(Vector3::new(0.0, -20.0, z + 300.0), 100.0, white, &mirror));
+    world
+}
+
+#[allow(dead_code)]
+fn create_world3<'a>(_frame: u32) -> World<'a> {
+    let mat: BaseMaterial = BaseMaterial::DEFAULT;
+    let _mirror: BaseMaterial = BaseMaterial {
+        reflectivity: 0.9,
+        ..mat
+    };
+
+    let white = Rgb([1.0, 1.0, 1.0]);
+    let _green = Rgb([0.0, 1.0, 0.0]);
+    let _blue = Rgb([0.0, 0.0, 1.0]);
+
+    let mut world = World::new();
+
+    world.add_light(Light::new(Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -1.0)), white));
+    //world.add(Plane::new(Vector3::new(0.0, -100.0, 0.0), Vector3::new(0.0, 1.0, 0.0), &Surface::new(green, &mat)));
+    world.add(Sphere::new(Vector3::new(20.0, 20.0, 100.0), 20.0, &Surface::new(white, &mat)));
     world
 }
 
