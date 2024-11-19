@@ -1,4 +1,4 @@
-use crate::vector::Vector3;
+use crate::vector::{Vector3, VectorOps};
 use crate::world::intersect::{Intersecting, Intersection};
 use crate::world::object::{HitResult, Object};
 use crate::world::ray::Ray;

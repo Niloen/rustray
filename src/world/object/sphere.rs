@@ -15,7 +15,7 @@ impl<'a> Sphere<'a> {
 
     fn distance(&self, ray: &Ray) -> Option<f64> {
         let l = self.center - ray.origin;
-        let is_inside_sphere = l.length() < self.radius;
+        let is_inside_sphere = l.magnitude() < self.radius;
         if is_inside_sphere {
             return None;
         }

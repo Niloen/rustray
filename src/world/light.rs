@@ -1,5 +1,5 @@
 use image::{Pixel, Rgb};
-use crate::vector::Vector3;
+use crate::vector::{Vector3, VectorOps};
 use crate::world::ray::Ray;
 
 pub struct Light {
@@ -24,7 +24,7 @@ impl Light {
     }
     
     pub fn distance_to(&self, position: Vector3) -> f64 {
-        return self.towards_direction(position).length()
+        return self.towards_direction(position).magnitude()
     }
     
     pub fn illuminate(&self, position: Vector3, normal: Vector3) -> Rgb<f64> {
