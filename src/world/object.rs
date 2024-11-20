@@ -1,12 +1,10 @@
-use image::Rgb;
-use nalgebra::distance;
 use crate::vector::{Point3, Vector3};
-use crate::world::{Geometry, Material, Surface};
 use crate::world::geometry::{Cube, HitResult, Plane, Sphere};
 use crate::world::intersect::{Intersecting, Intersection};
 use crate::world::ray::Ray;
 use crate::world::texture::Texture;
 use crate::world::transform::Transform;
+use crate::world::{Geometry, Surface};
 
 pub struct Object {
     pub geometry: Box<dyn Geometry>, // The geometry (e.g., sphere, plane)
@@ -53,10 +51,10 @@ impl Object {
 
 impl Intersecting for Object {
     fn intersects(&self, ray: &Ray) -> Option<Intersection> {
-        self.distance(ray).map(|distance| Intersection {
+        self.distance(ray).map(|distance| Intersection::new(
             distance,
-            object: self,
-        })
+            self
+        ))
     }
 }
 

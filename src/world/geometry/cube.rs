@@ -1,11 +1,6 @@
-use std::ops::Neg;
 use crate::vector::{Point3, Vector3};
-use crate::world::geometry::{HitResult, Geometry};
+use crate::world::geometry::{Geometry, HitResult};
 use crate::world::ray::Ray;
-use crate::world::material::Material;
-use image::Rgb;
-use crate::world::intersect::{Intersecting, Intersection};
-use crate::world::surface::Surface;
 
 #[derive(Debug)]
 pub struct Cube {

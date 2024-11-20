@@ -1,15 +1,15 @@
+use crate::vector::Point3;
 pub use crate::world::cast::RayCaster;
+pub use crate::world::geometry::Geometry;
 use crate::world::group::Group;
+use crate::world::intersect::Intersection;
 pub use crate::world::light::Light;
 pub use crate::world::material::{BaseMaterial, Material};
-pub use crate::world::geometry::Geometry;
-pub use crate::world::surface::Surface;
+pub use crate::world::object::Object;
 use crate::world::ray::Ray;
+pub use crate::world::surface::Surface;
 use image::{Pixel, Rgb};
 use intersect::Intersecting;
-use crate::vector::{Point3, Vector3};
-use crate::world::intersect::Intersection;
-pub use crate::world::object::Object;
 
 pub mod ray;
 pub mod geometry;

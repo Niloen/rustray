@@ -1,5 +1,4 @@
 use crate::vector::{Point3, Vector3};
-use crate::world::intersect::Intersecting;
 use crate::world::ray::Ray;
 pub use sphere::Sphere;
 pub use cube::Cube;

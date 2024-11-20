@@ -1,14 +1,12 @@
 use crate::camera::Camera;
 use crate::vector::{Point3, Vector3};
 use crate::visualize::show;
+use crate::visualize::ShowMessage::{ShowImage, ShowPixelMessage};
 use crate::world::ray::Ray;
-use crate::world::geometry::{Plane, Sphere};
+use crate::world::texture::CheckerboardTexture;
 use crate::world::{BaseMaterial, Light, Object, Surface, World};
 use image::{Rgb, RgbImage};
 use std::time::Instant;
-use crate::visualize::ShowMessage::{ShowImage, ShowPixelMessage};
-use crate::world::geometry::Cube;
-use crate::world::texture::CheckerboardTexture;
 
 mod world;
 mod vector;

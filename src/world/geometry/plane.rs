@@ -1,7 +1,6 @@
 use crate::vector::{Point3, Vector3, VectorOps};
 use crate::world::geometry::{Geometry, HitResult, TextureCoords};
 use crate::world::ray::Ray;
-use crate::world::texture::Texture;
 
 pub struct Plane {
     tangent: Vector3,

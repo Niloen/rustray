@@ -1,6 +1,4 @@
-use crate::world::Geometry;
 use crate::world::intersect::{Intersecting, Intersection};
-use crate::world::object::Object;
 use crate::world::ray::Ray;
 
 pub struct Group {

@@ -1,8 +1,8 @@
-use std::fmt::Debug;
-use image::{Pixel, Rgb};
 use crate::world::geometry::HitResult;
 use crate::world::ray::Ray;
-use crate::world::{RayCaster, Surface};
+use crate::world::RayCaster;
+use image::{Pixel, Rgb};
+use std::fmt::Debug;
 
 pub trait Material: Send + Sync + Debug {
     /// Calculates the color for the material at an intersection point.

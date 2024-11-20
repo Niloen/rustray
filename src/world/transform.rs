@@ -23,6 +23,7 @@ impl Transform {
     }
 
     /// Identity transform (no transformation)
+    #[allow(dead_code)]
     pub fn identity() -> Self {
         Self {
             matrix: Matrix4::identity(),

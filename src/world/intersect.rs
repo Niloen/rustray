@@ -1,4 +1,3 @@
-use crate::world::Geometry;
 use crate::world::object::Object;
 use crate::world::ray::Ray;
 
