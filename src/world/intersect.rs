@@ -1,13 +1,14 @@
-use crate::world::Object;
+use crate::world::Geometry;
+use crate::world::object::Object;
 use crate::world::ray::Ray;
 
-pub struct Intersection<'a, 'b> {
+pub struct Intersection<'a> {
     pub distance: f64,
-    pub object: &'a dyn Object<'b>
+    pub object: &'a Object
 }
 
-impl<'a, 'b> Intersection<'a, 'b> {
-    pub fn new(distance: f64, object: &'a dyn Object<'b>) -> Self {
+impl<'a> Intersection<'a> {
+    pub fn new(distance: f64, object: &'a Object) -> Self {
         Self {
             distance,
             object
@@ -15,9 +16,6 @@ impl<'a, 'b> Intersection<'a, 'b> {
     }
 }
 
-pub trait Intersecting<'a>: Send + Sync {
-    fn intersects<'b, 'z>(&'b self, ray: &Ray) -> Option<Intersection<'z, 'a>>
-    where
-        'a: 'z,
-        'b: 'z;
+pub trait Intersecting: Send + Sync {
+    fn intersects(&self, ray: &Ray) -> Option<Intersection>;
 }

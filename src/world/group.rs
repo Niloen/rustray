@@ -1,28 +1,26 @@
-use crate::world::Object;
+use crate::world::Geometry;
 use crate::world::intersect::{Intersecting, Intersection};
+use crate::world::object::Object;
 use crate::world::ray::Ray;
 
-pub struct Group<'a> {
-    objects: Vec<Box<dyn Intersecting<'a> + 'a>>,
+pub struct Group {
+    objects: Vec<Box<dyn Intersecting>>,
 }
 
-impl<'a> Group<'a> {
-    pub fn new() -> Group<'a> {
+impl Group {
+    pub fn new() -> Group {
         Group {
             objects: Vec::new(),
         }
     }
 
-    pub fn add<T: Object<'a> + 'a>(&mut self, object: T) {
+    pub fn add(&mut self, object: impl Intersecting + 'static) {
         self.objects.push(Box::new(object));
     }
 }
 
-impl<'a> Intersecting<'a> for Group<'a> {
-    fn intersects<'b, 'z>(&'b self, ray: &Ray) -> Option<Intersection<'z, 'a>>
-    where
-        'a: 'z,
-        'b: 'z
+impl Intersecting for Group {
+    fn intersects(&self, ray: &Ray) -> Option<Intersection>
     {
         let mut result: Option<Intersection> = None;
         let mut shortest: f64 = f64::MAX;

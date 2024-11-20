@@ -1,13 +1,13 @@
 use std::fmt::Debug;
 use image::{Pixel, Rgb};
-use crate::world::object::HitResult;
+use crate::world::geometry::HitResult;
 use crate::world::ray::Ray;
-use crate::world::RayCaster;
+use crate::world::{RayCaster, Surface};
 
 pub trait Material: Send + Sync + Debug {
     /// Calculates the color for the material at an intersection point.
     /// Takes the ray that hit the object, the hit result, the ray caster function, and the recursion depth.
-    fn shade(&self, ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64>;
+    fn shade(&self, ray: &Ray, hit: &HitResult, color: Rgb<f64>, caster: &dyn RayCaster, depth: u32) -> Rgb<f64>;
     fn clone_box(&self) -> Box<dyn Material>;
 }
 
@@ -19,13 +19,13 @@ pub struct BaseMaterial {
 }
 
 impl Material for BaseMaterial {
-    fn shade(&self, ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
+    fn shade(&self, ray: &Ray, hit: &HitResult, color: Rgb<f64>, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
         // Basic shading logic with adjustable parameters
 
         let mut color = if self.reflectivity < 1.0 {
             caster.direct_lightning(&Ray::new(hit.position, hit.normal))
                 .map(|c| c * (1.0 - self.reflectivity))
-                .map2(&hit.surface.color, |c1, c2|c1 * c2)
+                .map2(&color, |c1, c2|c1 * c2)
         } else {
             Rgb([0.0, 0.0, 0.0]) // Skip diffuse lighting for fully reflective surfaces
         };

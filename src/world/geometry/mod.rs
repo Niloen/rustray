@@ -1,24 +1,25 @@
-use crate::vector::Vector3;
+use crate::vector::{Point3, Vector3};
 use crate::world::intersect::Intersecting;
 use crate::world::ray::Ray;
 pub use sphere::Sphere;
 pub use cube::Cube;
 pub use plane::Plane;
-use crate::world::surface::Surface;
-
 mod sphere;
 mod cube;
 mod plane;
 
+pub type TextureCoords = (f64, f64);
+
 #[derive(Debug)]
 pub struct HitResult {
-    pub position: Vector3,
+    pub position: Point3,
     pub normal: Vector3,
-    pub surface: Surface,
+    pub coords: TextureCoords
 }
 
-pub trait Object<'a>: Send + Sync + Intersecting<'a>{
+pub trait Geometry: Send + Sync {
+    
+    fn distance(&self, ray: &Ray) -> Option<f64>;
 
     fn hit(&self, ray: &Ray) -> Option<HitResult>;
 }
-

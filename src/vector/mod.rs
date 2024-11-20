@@ -1,6 +1,10 @@
 use nalgebra::Vector3 as NVector3;
+use nalgebra::Matrix4 as NMatrix4;
+use nalgebra::Point3 as NPoint3;
 
 pub type Vector3 = NVector3<f64>;
+pub type Matrix4 = NMatrix4<f64>;
+pub type Point3 = NPoint3<f64>;
 
 pub trait VectorOps {
     fn perpendicular(&self) -> Vector3;

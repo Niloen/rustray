@@ -1,22 +1,21 @@
 mod checkerboard;
 pub use checkerboard::CheckerboardTexture;
-
+use crate::world::geometry::TextureCoords;
 use crate::world::surface::Surface;
-pub type TextureCoords = (f64, f64);
 
-pub trait Texture<'a>: Send + Sync {
+pub trait Texture: Send + Sync {
     /// Returns a `Surface` at the given `TextureCoords` on the object's surface.
     fn surface_at(&self, coords: TextureCoords) -> Surface;
 
-    fn clone_box(&self) -> Box<dyn Texture<'a> + 'a>;
+    fn clone_box(&self) -> Box<dyn Texture>;
 }
 
-impl<'a> Texture<'a> for Surface {
+impl Texture for Surface {
     fn surface_at(&self, _coords: TextureCoords) -> Surface {
         self.clone()
     }
 
-    fn clone_box(&self) -> Box<dyn Texture<'a> + 'a> {
+    fn clone_box(&self) -> Box<dyn Texture> {
         Box::new(self.clone())
     }
 }
