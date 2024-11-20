@@ -41,10 +41,10 @@ impl Transform {
 
     /// Converts a ray to local space.
     pub fn to_local_ray(&self, ray: &Ray) -> Ray {
-        Ray {
-            origin: self.to_local_point(&ray.origin),
-            direction: self.inverse_matrix.transform_vector(&ray.direction),
-        }
+        Ray::new(
+            self.to_local_point(&ray.origin),
+            self.inverse_matrix.transform_vector(&ray.direction)
+        )
     }
 
     /// Generates a rotation matrix from Euler angles.
