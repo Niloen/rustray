@@ -95,13 +95,13 @@ fn create_world3(_frame: u32) -> World {
     };
 
     let white = Rgb([1.0, 1.0, 1.0]);
-    let _green = Rgb([0.0, 1.0, 0.0]);
+    let green = Rgb([0.0, 1.0, 0.0]);
     let _blue = Rgb([0.0, 0.0, 1.0]);
 
     let mut world = World::new();
 
     world.add_light(Light::new(Ray::new(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -1.0)), white));
-    //world.add(Object::plane(Point3::new(0.0, -100.0, 0.0), Vector3::new(0.0, 1.0, 0.0), &Surface::new(green, &mat)));
+    world.add(Object::plane(Point3::new(0.0, -100.0, 0.0), Vector3::new(0.0, 1.0, 0.0), &Surface::new(green, &mat)));
     world.add(Object::sphere(Point3::new(20.0, 20.0, 100.0), 20.0, &Surface::new(white, &mat)));
     world
 }
