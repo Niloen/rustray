@@ -1,7 +1,7 @@
 use image::Rgb;
 use crate::algebra::{Point3, Vector3};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[non_exhaustive]
 pub struct Ray {
     pub origin: Point3,

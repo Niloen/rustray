@@ -3,6 +3,7 @@ use crate::scene::ray::Ray;
 pub use sphere::Sphere;
 pub use cube::Cube;
 pub use plane::Plane;
+
 mod sphere;
 mod cube;
 mod plane;

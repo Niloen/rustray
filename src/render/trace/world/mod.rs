@@ -1,15 +1,16 @@
 use crate::algebra::Point3;
-pub use crate::scene::ray::RayCaster;
+use crate::render::trace::world::group::Group;
+use crate::render::trace::world::intersect::Intersection;
 pub use crate::scene::geometry::Geometry;
-use crate::world::group::Group;
-use crate::world::intersect::Intersection;
 pub use crate::scene::light::Light;
-pub use crate::scene::material::{BaseMaterial, Material};
+pub use crate::scene::material::Material;
 pub use crate::scene::object::Object;
 use crate::scene::ray::Ray;
-pub use crate::scene::surface::Surface;
+pub use crate::scene::ray::RayCaster;
+use crate::scene::Scene;
 use image::{Pixel, Rgb};
 use intersect::Intersecting;
+use std::sync::Arc;
 
 mod group;
 mod intersect;
@@ -31,8 +32,20 @@ impl World {
         }
     }
     
-    pub fn add(&mut self, object: Object) {
-        self.root.add(object);
+    pub fn from_scene(scene: &Scene) -> World {
+        let mut w = World::new();
+        scene.iter_objects().for_each(|obj| {
+            w.add(obj);
+        });
+        scene.iter_lights().for_each(|light| {
+            w.add_light(*light);
+        });
+        
+        w
+    }
+    
+    pub fn add(&mut self, object: &Arc<Object>) {
+        self.root.add(object.clone());
     }
     
     pub fn add_light(&mut self, light: Light) {

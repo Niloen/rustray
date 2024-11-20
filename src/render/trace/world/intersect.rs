@@ -1,5 +1,5 @@
 use crate::scene::object::Object;
-use crate::world::Geometry;
+use crate::scene::geometry::Geometry;
 use crate::scene::ray::Ray;
 
 #[non_exhaustive]

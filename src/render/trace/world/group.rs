@@ -1,8 +1,9 @@
-use crate::world::intersect::{Intersecting, Intersection};
+use std::sync::Arc;
+use crate::render::trace::world::intersect::{Intersecting, Intersection};
 use crate::scene::ray::Ray;
 
 pub struct Group {
-    objects: Vec<Box<dyn Intersecting>>,
+    objects: Vec<Arc<dyn Intersecting>>,
 }
 
 impl Group {
@@ -12,8 +13,8 @@ impl Group {
         }
     }
 
-    pub fn add(&mut self, object: impl Intersecting + 'static) {
-        self.objects.push(Box::new(object));
+    pub fn add(&mut self, object: Arc<dyn Intersecting>) {
+        self.objects.push(object);
     }
 }
 
