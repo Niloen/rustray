@@ -36,19 +36,31 @@ impl Transform {
         self.matrix.transform_point(point)
     }
 
-    /// Applies the inverse transform to a point (world to local).
-    pub fn to_local_point(&self, point: &Point3) -> Point3 {
-        self.inverse_matrix.transform_point(point)
-    }
-
     /// Converts a ray to local space.
     pub fn to_local_ray(&self, ray: &Ray) -> Ray {
-        Ray::new(
-            self.to_local_point(&ray.origin),
-            self.inverse_matrix.transform_vector(&ray.direction)
+        let origin = self.inline_transform_point(&ray.origin);
+        let direction = self.inline_transform_vector(&ray.direction);
+
+        Ray::new(origin, direction)
+    }
+
+    fn inline_transform_point(&self, point: &Point3) -> Point3 {
+        let p = self.inverse_matrix;
+        Point3::new(
+            p[(0, 0)] * point.x + p[(0, 1)] * point.y + p[(0, 2)] * point.z + p[(0, 3)],
+            p[(1, 0)] * point.x + p[(1, 1)] * point.y + p[(1, 2)] * point.z + p[(1, 3)],
+            p[(2, 0)] * point.x + p[(2, 1)] * point.y + p[(2, 2)] * point.z + p[(2, 3)],
         )
     }
 
+    fn inline_transform_vector(&self, vector: &Vector3) -> Vector3 {
+        let p = self.inverse_matrix;
+        Vector3::new(
+            p[(0, 0)] * vector.x + p[(0, 1)] * vector.y + p[(0, 2)] * vector.z,
+            p[(1, 0)] * vector.x + p[(1, 1)] * vector.y + p[(1, 2)] * vector.z,
+            p[(2, 0)] * vector.x + p[(2, 1)] * vector.y + p[(2, 2)] * vector.z,
+        )
+    }
     fn rotation_matrix(rotation: Vector3) -> Matrix4 {
         let angle = rotation.magnitude();
         if angle.abs() < 1e-6 {
