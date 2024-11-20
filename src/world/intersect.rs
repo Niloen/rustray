@@ -1,6 +1,7 @@
 use crate::world::object::Object;
 use crate::world::ray::Ray;
 
+#[non_exhaustive]
 pub struct Intersection<'a> {
     pub distance: f64,
     pub object: &'a Object
