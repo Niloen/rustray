@@ -1,4 +1,5 @@
-use crate::vector::{Point3, Vector3};
+use image::Rgb;
+use crate::algebra::{Point3, Vector3};
 
 #[derive(Debug)]
 #[non_exhaustive]
@@ -23,4 +24,10 @@ impl Ray {
         let reflected_direction = self.direction - normal * 2.0 * self.direction.dot(&normal);
         Ray::new(self.origin, reflected_direction)
     }    
+}
+
+pub trait RayCaster: Send + Sync {
+    fn cast(&self, ray: &Ray, depth: u32) -> Rgb<f64>;
+    
+    fn direct_lightning(&self, normal_ray: &Ray) -> Rgb<f64>;
 }

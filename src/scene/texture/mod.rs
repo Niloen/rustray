@@ -1,7 +1,7 @@
 mod checkerboard;
 pub use checkerboard::CheckerboardTexture;
-use crate::world::geometry::TextureCoords;
-use crate::world::surface::Surface;
+use crate::scene::geometry::TextureCoords;
+use crate::scene::surface::Surface;
 
 pub trait Texture: Send + Sync {
     /// Returns a `Surface` at the given `TextureCoords` on the object's surface.

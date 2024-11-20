@@ -1,6 +1,6 @@
 use nalgebra::Unit;
-use crate::vector::{Vector3, Matrix4, Point3};
-use crate::world::ray::Ray;
+use crate::algebra::{Vector3, Matrix4, Point3};
+use crate::scene::ray::Ray;
 
 #[derive(Debug, Clone)]
 pub struct Transform {

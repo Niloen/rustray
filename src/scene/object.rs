@@ -1,10 +1,10 @@
-use crate::vector::{Point3, Vector3};
-use crate::world::geometry::{Cube, HitResult, Plane, Sphere};
-use crate::world::intersect::{Intersecting, Intersection};
-use crate::world::ray::Ray;
-use crate::world::texture::Texture;
-use crate::world::transform::Transform;
-use crate::world::{Geometry, Surface};
+use crate::algebra::{Point3, Vector3};
+use crate::scene::geometry::{Cube, HitResult, Plane, Sphere};
+use crate::scene::ray::Ray;
+use crate::scene::texture::Texture;
+use crate::scene::transform::Transform;
+use crate::scene::geometry::Geometry;
+use crate::scene::surface::Surface;
 
 pub struct Object {
     pub geometry: Box<dyn Geometry>, // The geometry (e.g., sphere, plane)
@@ -47,15 +47,6 @@ impl Object {
     pub fn surface_at(&self, hr: &HitResult) -> Surface {
         self.texture.surface_at(hr.coords)
     } 
-}
-
-impl Intersecting for Object {
-    fn intersects(&self, ray: &Ray) -> Option<Intersection> {
-        self.distance(ray).map(|distance| Intersection::new(
-            distance,
-            self
-        ))
-    }
 }
 
 impl Geometry for Object {

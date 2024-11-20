@@ -1,18 +1,18 @@
 use crate::camera::Camera;
-use crate::vector::{Point3, Vector3};
+use crate::algebra::{Point3, Vector3};
 use crate::visualize::show;
 use crate::visualize::ShowMessage::{ShowImage, ShowPixelMessage};
-use crate::world::ray::Ray;
-use crate::world::texture::CheckerboardTexture;
+use scene::ray::Ray;
+use scene::texture::CheckerboardTexture;
 use crate::world::{BaseMaterial, Light, Object, Surface, World};
 use image::{Rgb, RgbImage};
 use std::time::Instant;
 
 mod world;
-mod vector;
+mod algebra;
 mod camera;
 mod visualize;
-
+mod scene;
 
 fn generate_image(world: &World, width: u32, height: u32, tx: impl Fn((u32, u32, Rgb<u8>)) + Send + Sync) -> RgbImage{
     let camera_base = Ray::new(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.1, 1.0).normalize());

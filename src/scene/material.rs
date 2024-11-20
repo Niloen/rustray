@@ -1,6 +1,6 @@
-use crate::world::geometry::HitResult;
-use crate::world::ray::Ray;
-use crate::world::RayCaster;
+use crate::scene::geometry::HitResult;
+use crate::scene::ray::Ray;
+use crate::scene::ray::RayCaster;
 use image::{Pixel, Rgb};
 use std::fmt::Debug;
 

@@ -1,6 +1,6 @@
 use image::{Pixel, Rgb};
-use crate::vector::{Point3, Vector3, VectorOps};
-use crate::world::ray::Ray;
+use crate::algebra::{Point3, Vector3, VectorOps};
+use crate::scene::ray::Ray;
 
 pub struct Light {
     pub ray: Ray,

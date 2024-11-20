@@ -1,27 +1,18 @@
-use crate::vector::Point3;
-pub use crate::world::cast::RayCaster;
-pub use crate::world::geometry::Geometry;
+use crate::algebra::Point3;
+pub use crate::scene::ray::RayCaster;
+pub use crate::scene::geometry::Geometry;
 use crate::world::group::Group;
 use crate::world::intersect::Intersection;
-pub use crate::world::light::Light;
-pub use crate::world::material::{BaseMaterial, Material};
-pub use crate::world::object::Object;
-use crate::world::ray::Ray;
-pub use crate::world::surface::Surface;
+pub use crate::scene::light::Light;
+pub use crate::scene::material::{BaseMaterial, Material};
+pub use crate::scene::object::Object;
+use crate::scene::ray::Ray;
+pub use crate::scene::surface::Surface;
 use image::{Pixel, Rgb};
 use intersect::Intersecting;
 
-pub mod ray;
-pub mod geometry;
 mod group;
-mod light;
-mod material;
-mod cast;
-pub mod texture;
-mod surface;
 mod intersect;
-mod transform;
-mod object;
 
 pub struct World {
     root: Group,

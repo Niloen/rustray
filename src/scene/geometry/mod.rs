@@ -1,5 +1,5 @@
-use crate::vector::{Point3, Vector3};
-use crate::world::ray::Ray;
+use crate::algebra::{Point3, Vector3};
+use crate::scene::ray::Ray;
 pub use sphere::Sphere;
 pub use cube::Cube;
 pub use plane::Plane;

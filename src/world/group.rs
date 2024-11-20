@@ -1,5 +1,5 @@
 use crate::world::intersect::{Intersecting, Intersection};
-use crate::world::ray::Ray;
+use crate::scene::ray::Ray;
 
 pub struct Group {
     objects: Vec<Box<dyn Intersecting>>,

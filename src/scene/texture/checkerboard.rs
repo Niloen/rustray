@@ -1,6 +1,6 @@
-use crate::world::geometry::TextureCoords;
-use crate::world::surface::Surface;
-use crate::world::texture::Texture;
+use crate::scene::geometry::TextureCoords;
+use crate::scene::surface::Surface;
+use crate::scene::texture::Texture;
 
 #[derive(Clone)]
 pub struct CheckerboardTexture {

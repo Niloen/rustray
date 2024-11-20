@@ -1,5 +1,5 @@
 use image::Rgb;
-use crate::world::material::Material;
+use crate::scene::material::Material;
 
 #[derive(Debug)]
 pub struct Surface {
