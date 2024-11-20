@@ -1,5 +1,6 @@
+use crate::world::geometry::TextureCoords;
 use crate::world::surface::Surface;
-use crate::world::texture::{Texture, TextureCoords};
+use crate::world::texture::Texture;
 
 #[derive(Clone)]
 pub struct CheckerboardTexture {
@@ -14,7 +15,7 @@ impl CheckerboardTexture {
     }
 }
 
-impl<'a> Texture<'a> for CheckerboardTexture {
+impl Texture for CheckerboardTexture {
     fn surface_at(&self, coords: TextureCoords) -> Surface {
         let (u, v) = coords;
         let checker = ((u * self.scale).floor() + (v * self.scale).floor()) as i32;
@@ -25,7 +26,7 @@ impl<'a> Texture<'a> for CheckerboardTexture {
         }
     }
 
-    fn clone_box(&self) -> Box<dyn Texture<'a> + 'a> {
+    fn clone_box(&self) -> Box<dyn Texture> {
         return Box::new(self.clone());
     }
 }

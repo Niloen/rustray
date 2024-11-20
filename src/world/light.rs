@@ -1,5 +1,5 @@
 use image::{Pixel, Rgb};
-use crate::vector::{Vector3, VectorOps};
+use crate::vector::{Point3, Vector3, VectorOps};
 use crate::world::ray::Ray;
 
 pub struct Light {
@@ -15,19 +15,19 @@ impl Light {
         }
     }
     
-    pub fn towards(&self, position: Vector3) -> Ray {
+    pub fn towards(&self, position: Point3) -> Ray {
         Ray::new(position, self.towards_direction(position))
     }
     
-    pub fn towards_direction(&self, position: Vector3) -> Vector3 {
+    pub fn towards_direction(&self, position: Point3) -> Vector3 {
         self.ray.origin - position
     }
     
-    pub fn distance_to(&self, position: Vector3) -> f64 {
+    pub fn distance_to(&self, position: Point3) -> f64 {
         return self.towards_direction(position).magnitude()
     }
     
-    pub fn illuminate(&self, position: Vector3, normal: Vector3) -> Rgb<f64> {
+    pub fn illuminate(&self, position: Point3, normal: Vector3) -> Rgb<f64> {
         let mut fraction = self.towards(position).direction.cos_angle(&normal);
         if fraction < 0.0 {
             fraction = 0.0
