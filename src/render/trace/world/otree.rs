@@ -1,7 +1,9 @@
+use std::fmt;
 use std::sync::Arc;
 use crate::algebra::{Bounded, BoundingBox, Ray};
 use crate::render::trace::world::intersect::{Intersecting, Intersection};
 
+#[derive(Debug)]
 pub struct OctreeConfig {
     pub max_objects: usize,
     pub max_depth: usize,
@@ -21,10 +23,30 @@ impl OctreeConfig {
 pub struct OctreeNode {
     bounding_box: BoundingBox,
     children: Option<Vec<OctreeNode>>, // 8 child nodes if subdivided
-    objects: Vec<Arc<dyn Intersecting>>,        // Objects stored in this node
+    objects: Vec<Arc<dyn Intersecting>>,  
     depth: usize,                     // Depth of this node in the tree
 }
 
+impl fmt::Debug for OctreeNode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "OctreeNode {{ depth: {}, bounding_box: {:?}, objects: {}, children: {} }}",
+            self.depth,
+            self.bounding_box,
+            self.objects.len(),
+            if self.children.is_some() { 8 } else { 0 }
+        )?;
+
+        if let Some(children) = &self.children {
+            for (i, child) in children.iter().enumerate() {
+                write!(f, "\nChild {}: {:?}", i, child)?;
+            }
+        }
+
+        Ok(())
+    }
+}
 impl OctreeNode {
     /// Creates a new empty octree node with the given bounding box and depth.
     pub fn new(bounding_box: BoundingBox, depth: usize) -> Self {
@@ -82,6 +104,7 @@ impl OctreeNode {
                 if child.bounding_box.expand_by_factor(config.loose_factor).contains(obj_bbox) {
                     child.insert(obj.clone(), obj_bbox, config);
                     fits_in_child = true;
+                    break; // Only in one
                 }
             }
         }
@@ -91,41 +114,26 @@ impl OctreeNode {
             self.objects.push(obj);
         }
     }
-    fn intersect_list<'a>(&'a self, xs: &'a Vec<impl Intersecting + 'a>, ray: &Ray) -> Option<Intersection> {
-        let mut result: Option<Intersection> = None;
-        let mut shortest: f64 = f64::MAX;
-        for x in xs {
-            if let Some(intersection) = x.intersects(ray) {
-                if intersection.distance < shortest {
-                    shortest = intersection.distance;
-                    result.replace(intersection);
-                }
-            }
-        }
-        result
-    }
-
-    fn intersects_objects(&self, ray: &Ray) -> Option<Intersection> {
-        self.intersect_list(&self.objects, ray)
-    }
-
-    fn intersects_children(&self, ray: &Ray) -> Option<Intersection> {
-        if let Some(children) = &self.children {
-            self.intersect_list(&children, ray)
-        } else {
-            None
-        }
-    }
 }
 
 impl Intersecting for OctreeNode {
-    fn intersects(&self, ray: &Ray) -> Option<Intersection> {
+    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection> {
         if !self.bounding_box.intersects_ray(ray) {
             return None;
         }
 
-        self.intersects_objects(ray)
-            .or_else(|| self.intersects_children(ray))
+        // Start with the result from the objects in this node
+        let mut result = self.objects.intersects(ray, max);
+
+        // Check intersections in the children
+        if let Some(children) = &self.children {
+            if let Some(result2) = children.intersects(ray, result.as_ref().map_or(max, |i| i.distance)) {
+                // Update result if the new intersection is closer
+                result = Some(result2);
+            }
+        }
+
+        result
     }
 
 }
@@ -138,28 +146,60 @@ impl Bounded for OctreeNode {
 
 pub struct Octree {
     root: OctreeNode,
+    outside: Vec<Arc<dyn Intersecting>>, // Objects not fit for tree, such as infinite objects
     config: OctreeConfig,
 }
 
+impl fmt::Debug for Octree {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "OcTree {{ root: {:?}, config: {:?}, objects: {} }}",
+            self.root,
+            self.config,
+            self.outside.len(),
+        )?;
+
+        Ok(())
+    }
+}
+
+
 impl Octree {
     /// Creates a new empty octree.
-    pub fn new(config: OctreeConfig) -> Self {
-        Self {
-            root: OctreeNode::new(BoundingBox::empty(), 0),
+    pub fn new(config: OctreeConfig, objects: Vec<Arc<dyn Intersecting>>) -> Self {
+        // Objects with infinite size cannot be handled with the tree
+        let (infinite, finite): (Vec<_>, Vec<_>) = objects.iter().map(|o|o.clone()).partition(|o|o.bounding_box().is_infinite());
+
+        let mut t = Self {
+            root: OctreeNode::new(finite.bounding_box(), 0),
+            outside: infinite,
             config,
-        }
+        };
+
+        finite.iter().for_each(|o|t.add(o.clone()));
+
+        t
     }
 
     /// Inserts an object into the octree.
-    pub fn add(&mut self, obj: Arc<dyn Intersecting>) {
+    fn add(&mut self, obj: Arc<dyn Intersecting>) {
         let bounding_box = obj.bounding_box();
         self.root.insert(obj, &bounding_box, &self.config);
     }
 }
 
 impl Intersecting for Octree {
-    fn intersects(&self, ray: &Ray) -> Option<Intersection> {
-        self.root.intersects(ray)
+    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+        // Start with the result from the objects in this node
+        let mut result = self.root.intersects(ray, max);
+
+        if let Some(result2) = self.outside.intersects(ray, result.as_ref().map_or(max, |i| i.distance)) {
+            // Update result if the new intersection is closer
+            result = Some(result2);
+        }
+
+        result
     }
 }
 

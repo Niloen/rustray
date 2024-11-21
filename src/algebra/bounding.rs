@@ -1,4 +1,5 @@
 use std::fmt;
+use std::sync::Arc;
 use crate::algebra::{Point3Ops, Vector3};
 use crate::algebra::{Point3, Ray};
 
@@ -24,6 +25,10 @@ impl BoundingBox {
         Self { min, max }
     }
 
+    pub fn is_infinite(&self) -> bool {
+        return self.min.iter().any(|v|*v == f64::MIN) || self.max.iter().any(|v|*v == f64::MAX); 
+    }
+    
     /// Expands the bounding box by a given loose factor.
     pub fn expand_by_factor(&self, factor: f64) -> Self {
         let center = self.center();
@@ -113,3 +118,19 @@ impl fmt::Display for BoundingBox {
 pub trait Bounded {
     fn bounding_box(&self) -> BoundingBox;
 }
+
+impl<T: Bounded + ?Sized> Bounded for Arc<T> {
+    fn bounding_box(&self) -> BoundingBox {
+        self.as_ref().bounding_box()
+    }
+}
+
+impl<T: Bounded> Bounded for Vec<T> {
+    fn bounding_box(&self) -> BoundingBox {
+        self
+            .iter()
+            .map(|obj| obj.bounding_box())
+            .fold(BoundingBox::empty(), |a, b| a.union(&b))
+    }
+}
+

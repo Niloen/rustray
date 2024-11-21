@@ -35,8 +35,8 @@ impl Plane {
 impl Bounded for Plane {
     fn bounding_box(&self) -> BoundingBox {
         BoundingBox::new(
-            Point3::new(-f64::MAX / 2.0, 0.0, -f64::MAX / 2.0), // Very large "min" corner
-            Point3::new(f64::MAX / 2.0, 0.0, f64::MAX / 2.0),   // Very large "max" corner
+            Point3::new(f64::MIN, 0.0, f64::MIN), // Very large "min" corner
+            Point3::new(f64::MAX, 0.0, f64::MAX),   // Very large "max" corner
         )
     }
 }

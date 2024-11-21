@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use gtk4::prelude::GestureExt;
 use crate::scene::object::Object;
 use crate::scene::geometry::Geometry;
 use crate::algebra::{Bounded, BoundingBox, Ray};
@@ -16,30 +17,58 @@ impl<'a> Intersection<'a> {
             object
         }
     }
+
+    pub fn min(&self, other: &'a Intersection) -> &Intersection {
+        if self.distance < other.distance {
+            self
+        } else {
+            other
+        }
+    }
 }
 
 pub trait Intersecting: Send + Sync + Bounded {
-    fn intersects(&self, ray: &Ray) -> Option<Intersection>;
+    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection>;
 }
 
 impl Intersecting for Object {
-    fn intersects(&self, ray: &Ray) -> Option<Intersection> {
-        self.distance(ray).map(|distance| Intersection::new(
+    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+        self.distance(ray).filter(|d|*d < max).map(|distance| Intersection::new(
             distance,
             self
         ))
     }
 }
 
-impl Intersecting for Arc<dyn Intersecting> {
-    fn intersects(&self, ray: &Ray) -> Option<Intersection> {
-        self.as_ref().intersects(ray)
+impl<T: Intersecting + ?Sized> Intersecting for Arc<T> {
+    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+        self.as_ref().intersects(ray, max)
     }
 }
 
-impl Bounded for Arc<dyn Intersecting> {
+impl<T: Intersecting> Intersecting for Vec<T> {
+    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+        let mut result: Option<Intersection> = None;
+        let mut shortest: f64 = max;
+        for x in self {
+            if let Some(intersection) = x.intersects(ray, shortest) {
+                shortest = intersection.distance;
+                result.replace(intersection);
+            }
+        }
+        result
+    }
+}
 
+impl Intersecting for &dyn Intersecting {
+    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+        (*self).intersects(ray, max)
+    }
+}
+
+impl Bounded for &dyn Intersecting {
     fn bounding_box(&self) -> BoundingBox {
-        self.as_ref().bounding_box()
+        return (*self).bounding_box();
     }
 }
+

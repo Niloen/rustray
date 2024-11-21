@@ -124,15 +124,15 @@ fn create_scene4<'a>(_frame: u32) -> Scene {
 
     let mut scene = Scene::new();
 
-    scene.add_light(Light::new(Ray::new(Point3::new(0.0, 0.0, z + 90.0), Vector3::new(0.0, 0.0, -1.0)), white));
-    scene.add(Object::plane(Point3::new(0.0, 0.0, z + 200.0), Vector3::new(0.0, 0.0, -1.0), &checkerboard_texture1));
-    scene.add(Object::sphere(Point3::new(0.0, 0.0, z), 60.0, &Surface::new(blue, &refrac)));
+    scene.add_light(Light::new(Ray::new(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -1.0)), white));
+    scene.add(Object::plane(Point3::new(0.0, -40.0, z + 200.0), Vector3::new(0.0, 1.0, 0.0), &checkerboard_texture1));
+    scene.add(Object::sphere(Point3::new(100.0, 100.0, z), 60.0, &Surface::new(blue, &mat)));
     scene
 }
 
 fn main() {
     let visualize = true;
-    let video = true;
+    let video = false;
     let width: u32 = 3820;
     let height: u32 = 1920;
 
