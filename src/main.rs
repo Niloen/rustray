@@ -132,7 +132,7 @@ fn create_scene4<'a>(_frame: u32) -> Scene {
 
 fn main() {
     let visualize = true;
-    let video = false;
+    let video = true;
     let width: u32 = 3820;
     let height: u32 = 1920;
 
