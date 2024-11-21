@@ -1,6 +1,6 @@
 use crate::scene::object::Object;
 use crate::scene::geometry::Geometry;
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 
 #[non_exhaustive]
 pub struct Intersection<'a> {

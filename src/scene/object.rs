@@ -1,6 +1,6 @@
 use crate::algebra::{Point3, Vector3};
 use crate::scene::geometry::{Cube, HitResult, Plane, Sphere};
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 use crate::scene::texture::Texture;
 use crate::scene::transform::Transform;
 use crate::scene::geometry::Geometry;

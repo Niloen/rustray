@@ -1,6 +1,6 @@
 use crate::algebra::{Point3, Vector3, VectorOps};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 
 pub struct Plane {
     tangent: Vector3,

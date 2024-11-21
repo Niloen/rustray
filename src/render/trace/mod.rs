@@ -2,7 +2,7 @@ use crate::algebra::{Point3, Vector3};
 use crate::render::trace::camera::Camera;
 use crate::render::trace::world::World;
 use crate::render::{RenderListener, Renderer};
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 use crate::scene::Scene;
 use image::RgbImage;
 use std::time::Instant;

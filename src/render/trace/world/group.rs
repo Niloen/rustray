@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use crate::render::trace::world::intersect::{Intersecting, Intersection};
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 
 pub struct Group {
     objects: Vec<Arc<dyn Intersecting>>,

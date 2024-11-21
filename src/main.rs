@@ -1,7 +1,7 @@
 use crate::algebra::{Point3, Vector3};
 use crate::visualize::show;
 use crate::visualize::ShowMessage::{ShowImage, ShowPixelMessage};
-use scene::ray::Ray;
+use crate::algebra::Ray;
 use scene::texture::CheckerboardTexture;
 use image::{Rgb, RgbImage};
 use crate::render::{RenderListener, Renderer, TraceRenderer};

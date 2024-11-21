@@ -1,6 +1,6 @@
 use crate::algebra::Point3;
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 
 impl Sphere {
     const CENTER: Point3 = Point3::new(0.0, 0.0, 0.0);

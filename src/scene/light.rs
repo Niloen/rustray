@@ -1,6 +1,6 @@
 use image::{Pixel, Rgb};
 use crate::algebra::{Point3, Vector3, VectorOps};
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Light {

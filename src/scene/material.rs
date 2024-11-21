@@ -1,5 +1,5 @@
 use crate::scene::geometry::HitResult;
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 use crate::scene::ray::RayCaster;
 use image::{Pixel, Rgb};
 use std::fmt::Debug;

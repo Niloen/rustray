@@ -1,3 +1,6 @@
+mod bounding;
+mod ray;
+pub use ray::Ray;
 use nalgebra::Vector3 as NVector3;
 use nalgebra::Matrix4 as NMatrix4;
 use nalgebra::Point3 as NPoint3;
@@ -26,5 +29,28 @@ impl VectorOps for Vector3 {
 
     fn cos_angle(&self, v: &Vector3) -> f64 {
         self.dot(v) / (self.magnitude() * v.magnitude())
+    }
+}
+
+pub trait Point3Ops {
+    fn min(&self, other: &Self) -> Self;
+    fn max(&self, other: &Self) -> Self;
+}
+
+impl Point3Ops for Point3 {
+    fn min(&self, other: &Self) -> Self {
+        Point3::new(
+            self.x.min(other.x),
+            self.y.min(other.y),
+            self.z.min(other.z),
+        )
+    }
+
+    fn max(&self, other: &Self) -> Self {
+        Point3::new(
+            self.x.max(other.x),
+            self.y.max(other.y),
+            self.z.max(other.z),
+        )
     }
 }

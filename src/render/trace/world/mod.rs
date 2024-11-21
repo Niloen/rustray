@@ -5,7 +5,7 @@ pub use crate::scene::geometry::Geometry;
 pub use crate::scene::light::Light;
 pub use crate::scene::material::Material;
 pub use crate::scene::object::Object;
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 pub use crate::scene::ray::RayCaster;
 use crate::scene::Scene;
 use image::{Pixel, Rgb};
@@ -31,7 +31,7 @@ impl World {
             lights: Vec::new()
         }
     }
-    
+
     pub fn from_scene(scene: &Scene) -> World {
         let mut w = World::new();
         scene.iter_objects().for_each(|obj| {
@@ -40,7 +40,7 @@ impl World {
         scene.iter_lights().for_each(|light| {
             w.add_light(*light);
         });
-        
+
         w
     }
     

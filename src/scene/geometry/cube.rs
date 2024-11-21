@@ -1,6 +1,6 @@
 use crate::algebra::{Point3, Vector3};
 use crate::scene::geometry::{Geometry, HitResult};
-use crate::scene::ray::Ray;
+use crate::algebra::Ray;
 
 #[derive(Debug)]
 pub struct Cube {
