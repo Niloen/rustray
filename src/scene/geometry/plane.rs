@@ -1,4 +1,4 @@
-use crate::algebra::{Point3, Vector3, VectorOps};
+use crate::algebra::{Bounded, BoundingBox, Point3, Vector3, VectorOps};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
 use crate::algebra::Ray;
 
@@ -31,6 +31,16 @@ impl Plane {
         (u, v)
     }
 }
+
+impl Bounded for Plane {
+    fn bounding_box(&self) -> BoundingBox {
+        BoundingBox::new(
+            Point3::new(-f64::MAX / 2.0, 0.0, -f64::MAX / 2.0), // Very large "min" corner
+            Point3::new(f64::MAX / 2.0, 0.0, f64::MAX / 2.0),   // Very large "max" corner
+        )
+    }
+}
+
 
 impl Geometry for Plane {
     fn distance(&self, ray: &Ray) -> Option<f64> {

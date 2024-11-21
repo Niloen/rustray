@@ -1,5 +1,4 @@
 use crate::algebra::Point3;
-use crate::render::trace::world::group::Group;
 use crate::render::trace::world::intersect::Intersection;
 pub use crate::scene::geometry::Geometry;
 pub use crate::scene::light::Light;
@@ -11,12 +10,13 @@ use crate::scene::Scene;
 use image::{Pixel, Rgb};
 use intersect::Intersecting;
 use std::sync::Arc;
+use crate::render::trace::world::ltree::{Octree, OctreeConfig};
 
-mod group;
 mod intersect;
+mod ltree;
 
 pub struct World {
-    root: Group,
+    root: Octree,
     lights: Vec<Light>
 }
 
@@ -27,7 +27,7 @@ fn min(v1: f64, v2: f64) -> f64 {
 impl World {
     pub fn new() -> World {
         World {
-            root: Group::new(),
+            root: Octree::new(OctreeConfig::new(10, 5, 1.5)),
             lights: Vec::new()
         }
     }

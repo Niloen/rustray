@@ -1,4 +1,4 @@
-use crate::algebra::Point3;
+use crate::algebra::{Bounded, BoundingBox, Point3};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
 use crate::algebra::Ray;
 
@@ -19,6 +19,13 @@ impl Sphere {
         (u, v)
     }
 }
+
+impl Bounded for Sphere {
+    fn bounding_box(&self) -> BoundingBox {
+        BoundingBox::new(Point3::new(-1.0, -1.0, -1.0), Point3::new(1.0, 1.0, 1.0))
+    }
+}
+
 impl Geometry for Sphere {
     fn distance(&self, ray: &Ray) -> Option<f64> {
         let l = Sphere::CENTER - ray.origin;

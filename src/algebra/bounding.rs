@@ -2,7 +2,7 @@ use std::fmt;
 use crate::algebra::{Point3Ops, Vector3};
 use crate::algebra::{Point3, Ray};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct BoundingBox {
     pub min: Point3,
     pub max: Point3,
@@ -24,10 +24,6 @@ impl BoundingBox {
         Self { min, max }
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.min.x > self.max.x || self.min.y > self.max.y || self.min.z > self.max.z
-    }
-    
     /// Expands the bounding box by a given loose factor.
     pub fn expand_by_factor(&self, factor: f64) -> Self {
         let center = self.center();
@@ -114,3 +110,6 @@ impl fmt::Display for BoundingBox {
     }
 }
 
+pub trait Bounded {
+    fn bounding_box(&self) -> BoundingBox;
+}

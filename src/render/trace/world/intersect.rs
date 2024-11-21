@@ -1,6 +1,7 @@
+use std::sync::Arc;
 use crate::scene::object::Object;
 use crate::scene::geometry::Geometry;
-use crate::algebra::Ray;
+use crate::algebra::{Bounded, BoundingBox, Ray};
 
 #[non_exhaustive]
 pub struct Intersection<'a> {
@@ -17,7 +18,7 @@ impl<'a> Intersection<'a> {
     }
 }
 
-pub trait Intersecting: Send + Sync {
+pub trait Intersecting: Send + Sync + Bounded {
     fn intersects(&self, ray: &Ray) -> Option<Intersection>;
 }
 
@@ -27,5 +28,18 @@ impl Intersecting for Object {
             distance,
             self
         ))
+    }
+}
+
+impl Intersecting for Arc<dyn Intersecting> {
+    fn intersects(&self, ray: &Ray) -> Option<Intersection> {
+        self.as_ref().intersects(ray)
+    }
+}
+
+impl Bounded for Arc<dyn Intersecting> {
+
+    fn bounding_box(&self) -> BoundingBox {
+        self.as_ref().bounding_box()
     }
 }

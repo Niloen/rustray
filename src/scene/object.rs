@@ -1,4 +1,4 @@
-use crate::algebra::{Point3, Vector3};
+use crate::algebra::{Bounded, BoundingBox, Point3, Vector3};
 use crate::scene::geometry::{Cube, HitResult, Plane, Sphere};
 use crate::algebra::Ray;
 use crate::scene::texture::Texture;
@@ -48,6 +48,44 @@ impl Object {
         self.texture.surface_at(hr.coords)
     } 
 }
+
+impl Bounded for Object {
+    fn bounding_box(&self) -> BoundingBox {
+        // Get the local bounding box of the geometry
+        let local_bbox = self.geometry.bounding_box();
+
+        // Transform the 8 corners of the local bounding box to world space
+        let corners = [
+            Point3::new(local_bbox.min.x, local_bbox.min.y, local_bbox.min.z),
+            Point3::new(local_bbox.min.x, local_bbox.min.y, local_bbox.max.z),
+            Point3::new(local_bbox.min.x, local_bbox.max.y, local_bbox.min.z),
+            Point3::new(local_bbox.min.x, local_bbox.max.y, local_bbox.max.z),
+            Point3::new(local_bbox.max.x, local_bbox.min.y, local_bbox.min.z),
+            Point3::new(local_bbox.max.x, local_bbox.min.y, local_bbox.max.z),
+            Point3::new(local_bbox.max.x, local_bbox.max.y, local_bbox.min.z),
+            Point3::new(local_bbox.max.x, local_bbox.max.y, local_bbox.max.z),
+        ];
+
+        // Transform each corner to world space
+        let transformed_corners: Vec<Point3> = corners
+            .iter()
+            .map(|corner| self.transform.apply_to_point(corner))
+            .collect();
+
+        // Find the new min and max points in world space
+        let min = transformed_corners
+            .iter()
+            .fold(Point3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY), |acc, p| acc.inf(p));
+        let max = transformed_corners
+            .iter()
+            .fold(Point3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY), |acc, p| acc.sup(p));
+
+        // Create the transformed bounding box
+        BoundingBox::new(min, max)
+    }
+}
+
+
 
 impl Geometry for Object {
     fn distance(&self, ray: &Ray) -> Option<f64> {

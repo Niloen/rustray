@@ -1,4 +1,4 @@
-use crate::algebra::{Point3, Vector3};
+use crate::algebra::{Bounded, BoundingBox, Point3, Vector3};
 use crate::scene::geometry::{Geometry, HitResult};
 use crate::algebra::Ray;
 
@@ -28,6 +28,12 @@ impl Cube {
         } else {
             Vector3::new(0.0, 0.0, offset.z.signum())
         }
+    }
+}
+
+impl Bounded for Cube {
+    fn bounding_box(&self) -> BoundingBox {
+        BoundingBox::new(Point3::new(-0.5, -0.5, -0.5), Point3::new(0.5, 0.5, 0.5))
     }
 }
 

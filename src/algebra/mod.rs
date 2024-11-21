@@ -1,7 +1,7 @@
 mod bounding;
 mod ray;
 pub use ray::Ray;
-pub use bounding::BoundingBox;
+pub use bounding::{BoundingBox, Bounded};
 use nalgebra::Vector3 as NVector3;
 use nalgebra::Matrix4 as NMatrix4;
 use nalgebra::Point3 as NPoint3;
