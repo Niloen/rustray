@@ -76,7 +76,7 @@ impl RayCaster for World {
     fn direct_lightning(&self, normal_ray: &Ray) -> Rgb<f64> {
         self.lights.iter()
             .filter(|light| {
-                !self.is_shadowed(normal_ray.at(41.0), light)
+                !self.is_shadowed(normal_ray.at(0.0001), light)
             })
             .map(|light| {
                 light.illuminate(normal_ray.origin, normal_ray.direction)
