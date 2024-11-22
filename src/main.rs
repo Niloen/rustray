@@ -76,8 +76,8 @@ fn create_scene2(frame: u32) -> Scene {
 
     scene.add(Object::sphere(Point3::new(20.0, 20.0, z + 100.0), 20.0, &Surface::new(white, &mirror)));
     scene.add(Object::sphere(Point3::new(-50.0 + 4.0 * frame as f64, 20.0, z + 75.0), 40.0, &Surface::new(white, &mirror)));
-    scene.add(Object::sphere(Point3::new(200.0, 0.0, z + 100.0), 100.0, &Surface::new(Rgb([1.0, 0.0, 0.0]), &mat)));
-    //scene.add(Object::sphere(Point3::new(-50.0, -50.0, 100.0), 50.0, Rgb([0.0, 1.0, 0.0]), &mat));
+    scene.add(Object::sphere(Point3::new(200.0, (frame as f64 * 0.25).sin().abs() * 100.0 , z + 100.0), 100.0, &Surface::new(Rgb([1.0, 0.0, 0.0]), &mat)));
+
     scene.add(Object::cube(Point3::new(-10.0, -25.0, z + 50.0), 20.0, &Surface::new(Rgb([0.0, 0.0, 1.0]), &mat)));
     scene.add(Object::cube(Point3::new(-50.0, -25.0, z + 120.0), 30.0, &Surface::new(Rgb([1.0, 1.0, 0.0]), &mat)));
     scene.add(Object::cube(Point3::new(0.0, -20.0, z + 300.0), 100.0, &Surface::new(white, &mirror)));
@@ -137,9 +137,9 @@ fn create_scene4<'a>(_frame: u32) -> Scene {
 fn main() {
     let visualize = true;
     let video = true;
-    let width: u32 = 3820;
-    let height: u32 = 1920;
-    let video_frames: u32 = 32;
+    let width: u32 = 3820 / 2;
+    let height: u32 = 1920 / 2;
+    let video_frames: u32 = 64;
     let video_buffer: u32 = 1;
 
     if visualize {
