@@ -34,7 +34,7 @@ impl World {
     pub fn new(objects: Vec<Arc<dyn Intersecting>>) -> World {
         World {
             root: if World::USE_OTREE {
-                Box::new(Octree::new(OctreeConfig::new(1, 5, 1.5), objects))
+                Box::new(Octree::new(OctreeConfig::new(8, 5, 1.5), objects))
             } else {
                 Box::new(objects)
             },
