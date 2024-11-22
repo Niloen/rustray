@@ -9,6 +9,8 @@ pub struct Light {
 }
 
 impl Light {
+    const BLACK: Rgb<f64> = Rgb([0.0, 0.0, 0.0]);
+    
     pub fn new(ray: Ray, color: Rgb<f64>) -> Self {
         Light {
             ray,
@@ -29,11 +31,13 @@ impl Light {
     }
     
     pub fn illuminate(&self, position: Point3, normal: Vector3) -> Rgb<f64> {
-        let mut fraction = self.towards(position).direction.cos_angle(&normal);
-        if fraction < 0.0 {
-            fraction = 0.0
+        let direction_to_light = self.towards_direction(position);
+        let fraction = direction_to_light.cos_angle(&normal);
+        
+        if fraction <= 0.0 {
+            return Self::BLACK;
         }
-
+        
         self.color.map(|c|c * fraction)
     }
 }
