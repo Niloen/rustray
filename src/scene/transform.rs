@@ -6,6 +6,7 @@ use crate::algebra::Ray;
 pub struct Transform {
     pub matrix: Matrix4,        // Transformation matrix (world space)
     pub inverse_matrix: Matrix4, // Precomputed inverse matrix (for local space)
+    scale: f64 // Precomputed scale
 }
 
 impl Transform {
@@ -19,16 +20,7 @@ impl Transform {
         let matrix = translation * rotation * scaling;
         let inverse_matrix = matrix.try_inverse().expect("Matrix must be invertible");
 
-        Self { matrix, inverse_matrix }
-    }
-
-    /// Identity transform (no transformation)
-    #[allow(dead_code)]
-    pub fn identity() -> Self {
-        Self {
-            matrix: Matrix4::identity(),
-            inverse_matrix: Matrix4::identity(),
-        }
+        Self { matrix, inverse_matrix, scale: Transform::calc_scale(&matrix) }
     }
 
     /// Applies the transform to a point in local space.
@@ -44,6 +36,10 @@ impl Transform {
         Ray::new(origin, direction)
     }
 
+    pub fn apply_to_distance(&self, distance: f64) -> f64 {
+        distance * self.scale
+    }
+    
     fn inline_transform_point(&self, point: &Point3) -> Point3 {
         let p = self.inverse_matrix;
         Point3::new(
@@ -70,11 +66,11 @@ impl Transform {
         let axis = Unit::new_normalize(rotation);
         Matrix4::from_axis_angle(&axis, angle)
     }
-
-    pub fn scale(&self) -> f64 {
-        let sx = self.matrix[(0, 0)].abs();
-        let sy = self.matrix[(1, 1)].abs();
-        let sz = self.matrix[(2, 2)].abs();
+    
+    fn calc_scale(matrix: &Matrix4) -> f64 {
+        let sx = matrix[(0, 0)].abs();
+        let sy = matrix[(1, 1)].abs();
+        let sz = matrix[(2, 2)].abs();
         sx.max(sy).max(sz) // Maximum for non-uniform scaling
     }
 

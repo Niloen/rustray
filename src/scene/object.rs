@@ -93,7 +93,7 @@ impl Geometry for Object {
 
         // Check for intersection in local space
         self.geometry.distance(&local_ray).map(|distance| {
-            distance * self.transform.scale()
+            self.transform.apply_to_distance(distance)
         })
     }
 
