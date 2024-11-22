@@ -129,8 +129,14 @@ impl<T: Bounded> Bounded for Vec<T> {
     fn bounding_box(&self) -> BoundingBox {
         self
             .iter()
+            .bounding_box()
+    }
+}
+
+impl<'a, T: Bounded> Bounded for std::slice::Iter<'a, T> {
+    fn bounding_box(&self) -> BoundingBox {
+        self.clone() // Clone the iterator to consume it
             .map(|obj| obj.bounding_box())
             .fold(BoundingBox::empty(), |a, b| a.union(&b))
     }
 }
-
