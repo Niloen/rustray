@@ -11,9 +11,9 @@ impl Sphere {
 
 
     fn texture_coords(&self, hit_position: &Point3) -> TextureCoords {
-        let local_point = hit_position.coords.normalize();
-        let u = 0.5 + (local_point.z.atan2(local_point.x) / (2.0 * std::f64::consts::PI));
-        let v = 0.5 - (local_point.y.asin() / std::f64::consts::PI);
+        // Assume the hit position is already on the unit sphere
+        let u = 0.5 + (hit_position.z.atan2(hit_position.x) / (2.0 * std::f64::consts::PI));
+        let v = 0.5 - (hit_position.y.asin() / std::f64::consts::PI);
         (u, v)
     }
 }
