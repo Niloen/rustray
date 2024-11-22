@@ -131,6 +131,10 @@ impl Intersecting for OctreeNode {
     }
 
     fn any_intersects(&self, ray: &Ray, max: f64) -> bool {
+        if !self.bounding_box.intersects_ray(ray) {
+            return false;
+        }
+        
         if self.objects.any_intersects(ray, max) {
             return true;
         }
