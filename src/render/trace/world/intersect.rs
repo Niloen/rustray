@@ -33,6 +33,13 @@ impl Intersecting for Object {
             self
         ))
     }
+
+    fn any_intersects(&self, ray: &Ray, max: f64) -> bool {
+        match self.distance(ray) {
+            None => false,
+            Some(d) => d <= max
+        }
+    }
 }
 
 impl<T: Intersecting + ?Sized> Intersecting for Arc<T> {
@@ -71,7 +78,7 @@ impl<'a, T: Intersecting> Intersecting for std::slice::Iter<'a, T> {
 
     fn any_intersects(&self, ray: &Ray, max: f64) -> bool {
         for x in self.clone() {
-            if x.closest_intersection(ray, max).is_some() {
+            if x.any_intersects(ray, max) {
                 return true
             }
         }
