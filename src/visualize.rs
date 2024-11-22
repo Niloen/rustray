@@ -2,7 +2,7 @@ use std::time::Duration;
 use async_channel::{Receiver, Sender};
 use gtk4::{gio, glib, Align, Application, ApplicationWindow, Label, Orientation, Picture};
 use gtk4::gdk_pixbuf::{Colorspace, Pixbuf};
-use gtk4::glib::timeout_future;
+use gtk4::glib::{timeout_future, Bytes};
 use gtk4::prelude::*;
 use image::{Rgb, RgbImage};
 
@@ -15,6 +15,19 @@ struct Processor {
     pub pixbuf: Pixbuf,
     dirty: bool,
     picture: Picture,
+}
+
+fn create_pixbuf_from_rgb_image(image: RgbImage) -> Pixbuf {
+    // Convert the RgbImage into a raw byte buffer
+    let (width, height) = image.dimensions();
+    let stride = 3 * width as i32; // 3 bytes per pixel (R, G, B)
+
+    // Convert the raw buffer into a `glib::Bytes`
+    let raw_buffer = image.into_raw(); // Consumes the RgbImage and returns a Vec<u8>
+    let buffer = Bytes::from(&raw_buffer[..]); // Create `glib::Bytes` from the slice
+
+    // Create the Pixbuf from the buffer
+    Pixbuf::from_bytes(&buffer, Colorspace::Rgb, false, 8, width as i32, height as i32, stride)
 }
 
 impl Processor {
@@ -54,9 +67,8 @@ impl Processor {
                 self.flush_pixels();
             }
             ShowMessage::ShowImage(image) => {
-                image.enumerate_pixels().for_each(|(x, y, c)| {
-                    self.put_pixel(x, y, *c);
-                });
+                self.pixbuf = create_pixbuf_from_rgb_image(image);
+                self.dirty = true;
                 self.flush_pixels();
             }
         }

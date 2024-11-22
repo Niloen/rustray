@@ -4,6 +4,8 @@ use crate::visualize::ShowMessage::{ShowImage, ShowPixelMessage};
 use crate::algebra::Ray;
 use scene::texture::CheckerboardTexture;
 use image::{Rgb, RgbImage};
+use nalgebra::min;
+use crate::buffer::BufferedChannel;
 use crate::render::{RenderListener, Renderer, TraceRenderer};
 use crate::scene::light::Light;
 use crate::scene::material::BaseMaterial;
@@ -15,6 +17,7 @@ mod algebra;
 mod visualize;
 mod scene;
 mod render;
+mod buffer;
 
 fn generate_image(scene: &Scene, width: u32, height: u32, tx: impl RenderListener) -> RgbImage {
     let renderer = TraceRenderer::new();
@@ -130,20 +133,24 @@ fn create_scene4<'a>(_frame: u32) -> Scene {
     scene
 }
 
+
 fn main() {
     let visualize = true;
     let video = true;
     let width: u32 = 3820;
     let height: u32 = 1920;
+    let video_frames: u32 = 32;
+    let video_buffer: u32 = 1;
 
     if visualize {
         show(width as i32, height as i32, move |tx| {
             if video {
-                for i in 0..1024 {
+                let btx = BufferedChannel::new(min(video_frames as usize, video_buffer as usize), move |m|tx.send_blocking(m).unwrap());
+                for i in 0..video_frames {
                     let scene = create_scene(i);
                     let image = generate_image(&scene, width, height, |_m| {});
 
-                    tx.send_blocking(ShowImage(image)).unwrap()
+                    btx.send(ShowImage(image)).unwrap()
                 }
             } else {
                 let scene = create_scene(0);
