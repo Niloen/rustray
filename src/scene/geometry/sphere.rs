@@ -1,11 +1,9 @@
+use std::ops::Neg;
 use crate::algebra::{Bounded, BoundingBox, Point3};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
 use crate::algebra::Ray;
 
 impl Sphere {
-    const CENTER: Point3 = Point3::new(0.0, 0.0, 0.0);
-    const RADIUS: f64 = 1.0;
-    
     pub fn new() -> Sphere {
         Sphere {
         }
@@ -13,7 +11,7 @@ impl Sphere {
 
 
     fn texture_coords(&self, hit_position: &Point3) -> TextureCoords {
-        let local_point = (*hit_position - Sphere::CENTER).normalize();
+        let local_point = hit_position.coords.normalize();
         let u = 0.5 + (local_point.z.atan2(local_point.x) / (2.0 * std::f64::consts::PI));
         let v = 0.5 - (local_point.y.asin() / std::f64::consts::PI);
         (u, v)
@@ -28,45 +26,49 @@ impl Bounded for Sphere {
 
 impl Geometry for Sphere {
     fn distance(&self, ray: &Ray) -> Option<f64> {
-        let l = Sphere::CENTER - ray.origin;
-        let is_inside_sphere = l.magnitude() < Sphere::RADIUS;
-        if is_inside_sphere {
+        // Vector from ray origin to sphere center (center is always (0,0,0))
+        let origin_to_center = ray.origin.coords;
+
+        // Projection of origin_to_center onto the ray direction
+        let tca = origin_to_center.neg().dot(&ray.direction);
+
+        // Squared distance from sphere center to the ray
+        let d2 = origin_to_center.magnitude_squared() - tca * tca;
+
+        // If d^2 > 1, the ray misses the sphere
+        if d2 > 1.0 {
             return None;
         }
-        let tca = l.dot(&ray.direction);
-        let d2 = l.dot(&l) - tca * tca;
-        if d2 > Sphere::RADIUS * Sphere::RADIUS {
-            return None;
-        }
-        let thc = (Sphere::RADIUS * Sphere::RADIUS - d2).sqrt();
-        let mut t0 = tca - thc;
-        let mut t1 = tca + thc;
 
-        if t0 > t1 {
-            std::mem::swap(&mut t0, &mut t1);
-        }
+        // Distance from the ray to the sphere's intersection points
+        let thc = (1.0 - d2).sqrt();
 
-        // Standard logic for rays originating outside the sphere
-        if t0 < 0.0 {
-            t0 = t1; // If t0 is negative, let's use t1 instead
-            if t0 < 0.0 {
-                return None; // Both t0 and t1 are negative
-            }
+        // Compute the near and far intersection distances
+        let t0 = tca - thc;
+        let t1 = tca + thc;
+
+        // Choose the closest positive intersection
+        if t0 > 0.0 {
+            Some(t0)
+        } else if t1 > 0.0 {
+            Some(t1)
+        } else {
+            None
         }
-        Some(t0)
     }
 
     fn hit(&self, ray: &Ray) -> Option<HitResult> {
-        return self.distance(ray).map(|t0| {
+        self.distance(ray).map(|t0| {
             let position = ray.at(t0);
-            let normal = (position - Sphere::CENTER).normalize();
+            let normal = -position.coords.normalize();
             HitResult {
                 position,
                 normal,
-                coords: self.texture_coords(&position)
+                coords: self.texture_coords(&position),
             }
         })
     }
 }
+
 pub struct Sphere {
 }
