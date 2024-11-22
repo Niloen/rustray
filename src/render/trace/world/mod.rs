@@ -80,12 +80,15 @@ impl RayCaster for World {
     }
 
     fn direct_lightning(&self, normal_ray: &Ray) -> Rgb<f64> {
-        self.lights
-            .iter()
-            .filter(|light| !self.is_shadowed(normal_ray.at(0.0001), light))
-            .map(|light| light.illuminate(normal_ray.origin, normal_ray.direction))
-            .reduce(|c1, c2| c1.map2(&c2, |x1, x2| min(1.0, x1 + x2)))
-            .unwrap_or_else(|| Rgb([0.0, 0.0, 0.0]))
+        let mut c = Rgb([0.0, 0.0, 0.0]);
+
+        for l in self.lights.iter() {
+            if !self.is_shadowed(normal_ray.at(0.0001), l) {
+                c = c.map2(&l.illuminate(normal_ray.origin, normal_ray.direction), |x1, x2| min(1.0, x1 + x2))
+            }
+        }
+
+        c
     }
 }
 

@@ -23,9 +23,13 @@ impl Material for BaseMaterial {
         // Basic shading logic with adjustable parameters
 
         let mut color = if self.reflectivity < 1.0 {
-            caster.direct_lightning(&Ray::new(hit.position, hit.normal))
-                .map(|c| c * (1.0 - self.reflectivity))
-                .map2(&color, |c1, c2|c1 * c2)
+            if color == BaseMaterial::BLACK {
+                color
+            } else {
+                caster.direct_lightning(&Ray::new(hit.position, hit.normal))
+                    .map(|c| c * (1.0 - self.reflectivity))
+                    .map2(&color, |c1, c2|c1 * c2)
+            }
         } else {
             Rgb([0.0, 0.0, 0.0]) // Skip diffuse lighting for fully reflective surfaces
         };
@@ -60,6 +64,8 @@ impl BaseMaterial {
         reflectivity: 0.0,
         refractive: 1.0
     };
+
+    const BLACK: Rgb<f64> = Rgb([0.0, 0.0, 0.0]);
 
     fn reflected_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
         let reflected_direction = ray.reflect(hit.normal).direction;
