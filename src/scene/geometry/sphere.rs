@@ -1,7 +1,7 @@
-use std::ops::Neg;
+use crate::algebra::Ray;
 use crate::algebra::{Bounded, BoundingBox, Point3};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
-use crate::algebra::Ray;
+use std::ops::Neg;
 
 impl Sphere {
     pub fn new() -> Sphere {
@@ -58,13 +58,13 @@ impl Geometry for Sphere {
     }
 
     fn hit(&self, ray: &Ray) -> Option<HitResult> {
-        self.distance(ray).map(|t0| {
+        return self.distance(ray).map(|t0| {
             let position = ray.at(t0);
-            let normal = -position.coords.normalize();
+            let normal = position.coords.normalize();
             HitResult {
                 position,
                 normal,
-                coords: self.texture_coords(&position),
+                coords: self.texture_coords(&position)
             }
         })
     }

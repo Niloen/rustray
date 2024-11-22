@@ -11,6 +11,7 @@ pub type Matrix4 = NMatrix4<f64>;
 pub type Point3 = NPoint3<f64>;
 
 pub trait VectorOps {
+    #[allow(dead_code)]
     fn perpendicular(&self) -> Vector3;
 
     fn cos_angle(&self, v: &Vector3) -> f64;
