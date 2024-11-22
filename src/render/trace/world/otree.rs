@@ -117,17 +117,17 @@ impl OctreeNode {
 }
 
 impl Intersecting for OctreeNode {
-    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+    fn closest_intersection(&self, ray: &Ray, max: f64) -> Option<Intersection> {
         if !self.bounding_box.intersects_ray(ray) {
             return None;
         }
 
         // Start with the result from the objects in this node
-        let mut result = self.objects.intersects(ray, max);
+        let mut result = self.objects.closest_intersection(ray, max);
 
         // Check intersections in the children
         if let Some(children) = &self.children {
-            if let Some(result2) = children.intersects(ray, result.as_ref().map_or(max, |i| i.distance)) {
+            if let Some(result2) = children.closest_intersection(ray, result.as_ref().map_or(max, |i| i.distance)) {
                 // Update result if the new intersection is closer
                 result = Some(result2);
             }
@@ -190,11 +190,11 @@ impl Octree {
 }
 
 impl Intersecting for Octree {
-    fn intersects(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+    fn closest_intersection(&self, ray: &Ray, max: f64) -> Option<Intersection> {
         // Start with the result from the objects in this node
-        let mut result = self.root.intersects(ray, max);
+        let mut result = self.root.closest_intersection(ray, max);
 
-        if let Some(result2) = self.outside.intersects(ray, result.as_ref().map_or(max, |i| i.distance)) {
+        if let Some(result2) = self.outside.closest_intersection(ray, result.as_ref().map_or(max, |i| i.distance)) {
             // Update result if the new intersection is closer
             result = Some(result2);
         }

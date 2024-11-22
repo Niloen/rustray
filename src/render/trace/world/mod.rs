@@ -30,7 +30,6 @@ fn min(v1: f64, v2: f64) -> f64 {
 
 impl World {
     const USE_OTREE: bool = true;
-
     pub fn new(objects: Vec<Arc<dyn Intersecting>>) -> World {
         World {
             root: if World::USE_OTREE {
@@ -96,11 +95,9 @@ impl World {
     }
 
     fn is_something_within_distance(&self, ray: &Ray, distance: f64) -> bool {
-        self.cast_intersection(&ray)
-            .filter(|i| i.distance < distance)
-            .is_some()
+        self.root.any_intersects(&ray, distance)
     }
     fn cast_intersection(&self, ray: &Ray) -> Option<Intersection> {
-        self.root.intersects(ray, f64::MAX)
+        self.root.closest_intersection(ray, f64::MAX)
     }
 }
