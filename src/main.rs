@@ -109,7 +109,7 @@ fn create_scene4<'a>(_frame: u32) -> Scene {
         ..mat
     };
 
-    let refrac: BaseMaterial = BaseMaterial {
+    let _refrac: BaseMaterial = BaseMaterial {
         refractive: 4.0,
         ..mat
     };

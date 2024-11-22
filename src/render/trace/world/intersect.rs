@@ -1,8 +1,7 @@
-use std::sync::Arc;
-use gtk4::prelude::GestureExt;
-use crate::scene::object::Object;
-use crate::scene::geometry::Geometry;
 use crate::algebra::{Bounded, BoundingBox, Ray};
+use crate::scene::geometry::Geometry;
+use crate::scene::object::Object;
+use std::sync::Arc;
 
 #[non_exhaustive]
 pub struct Intersection<'a> {
@@ -15,14 +14,6 @@ impl<'a> Intersection<'a> {
         Self {
             distance,
             object
-        }
-    }
-
-    pub fn min(&self, other: &'a Intersection) -> &Intersection {
-        if self.distance < other.distance {
-            self
-        } else {
-            other
         }
     }
 }
@@ -54,7 +45,7 @@ impl<T: Intersecting + ?Sized> Intersecting for Arc<T> {
     }
 }
 
-fn closest_intersection_iter<'a, T>(
+pub fn closest_intersection_iter<'a, T>(
     iter: impl Iterator<Item = &'a T>,
     ray: &Ray,
     max: f64
