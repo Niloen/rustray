@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+use clap::Parser;
 use crate::algebra::{Point3, Vector3};
 use crate::visualize::show;
 use crate::visualize::ShowMessage::{ShowImage, ShowPixelMessage};
@@ -19,6 +21,38 @@ mod scene;
 mod render;
 mod buffer;
 
+/// Command-line interface for the raytracer application.
+#[derive(Parser)]
+#[command(version, about = "A raytracer application with optional video and visualization modes.")]
+struct Cli {
+    /// Width of the output image or video frame
+    #[arg(short, long, default_value_t = 3840)]
+    width: u32,
+
+    /// Height of the output image or video frame
+    #[arg(short, long, default_value_t = 1920)]
+    height: u32,
+
+    /// Number of frames to generate for video mode
+    #[arg(short = 'f', long, default_value_t = 64, requires = "video")]
+    video_frames: u32,
+
+    /// Buffer size for video frames
+    #[arg(short, long, default_value_t = 1, requires = "video")]
+    video_buffer: u32,
+
+    /// Enables visualization mode
+    #[arg(long)]
+    visualize: bool,
+
+    /// Enables video mode
+    #[arg(long)]
+    video: bool,
+
+    /// Path to save the generated image (ignored in visualization or video mode)
+    #[arg(short, long, value_name = "FILE")]
+    output: Option<PathBuf>,
+}
 fn generate_image(scene: &Scene, width: u32, height: u32, tx: impl RenderListener) -> RgbImage {
     let renderer = TraceRenderer::new();
     
@@ -135,33 +169,30 @@ fn create_scene4<'a>(_frame: u32) -> Scene {
 
 
 fn main() {
-    let visualize = true;
-    let video = true;
-    let width: u32 = 3820 / 2;
-    let height: u32 = 1920 / 2;
-    let video_frames: u32 = 64;
-    let video_buffer: u32 = 1;
+    let cli = Cli::parse();
 
-    if visualize {
-        show(width as i32, height as i32, move |tx| {
-            if video {
-                let btx = BufferedChannel::new(min(video_frames as usize, video_buffer as usize), move |m|tx.send_blocking(m).unwrap());
-                for i in 0..video_frames {
+    if cli.visualize {
+        show(cli.width as i32, cli.height as i32, move |tx| {
+            if cli.video {
+                let btx = BufferedChannel::new(min(cli.video_frames as usize, cli.video_buffer as usize), move |m|tx.send_blocking(m).unwrap());
+                for i in 0..cli.video_frames {
                     let scene = create_scene(i);
-                    let image = generate_image(&scene, width, height, |_m| {});
+                    let image = generate_image(&scene, cli.width, cli.height, |_m| {});
 
                     btx.send(ShowImage(image)).unwrap()
                 }
             } else {
                 let scene = create_scene(0);
-                generate_image(&scene, width, height, |(x, y, c)|tx.send_blocking(ShowPixelMessage(x, y, c)).unwrap());
+                generate_image(&scene, cli.width, cli.height, |(x, y, c)|tx.send_blocking(ShowPixelMessage(x, y, c)).unwrap());
             }
         })
     } else {
         let scene = create_scene(0);
-        let image = generate_image(&scene, width, height, |_m| {});
-        image.save("../example.png").unwrap();
-
-        println!("Generated image");
+        let image = generate_image(&scene, cli.width, cli.height, |_m| {});
+        if let Some(output_path) = cli.output {
+            image.save(output_path).expect("Failed to save image");
+        } else {
+            println!("No output file specified. Run with --help for usage instructions.");
+        }
     }
 }
