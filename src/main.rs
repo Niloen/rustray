@@ -8,7 +8,7 @@ use scene::texture::CheckerboardTexture;
 use image::{Rgb, RgbImage};
 use nalgebra::min;
 use crate::buffer::BufferedChannel;
-use crate::render::{RenderListener, Renderer, TraceRenderer};
+use crate::render::{RenderListener, Renderer, TraceRenderConfig, TraceRenderer};
 use crate::scene::light::Light;
 use crate::scene::material::BaseMaterial;
 use crate::scene::object::Object;
@@ -33,6 +33,9 @@ struct Cli {
     #[arg(short, long, default_value_t = 1920)]
     height: u32,
 
+    #[arg(long = "no-parallel", action = clap::ArgAction::SetFalse, default_value_t = true)]
+    parallel: bool,
+
     /// Number of frames to generate for video mode
     #[arg(short = 'f', long, default_value_t = 64, requires = "video")]
     video_frames: u32,
@@ -53,8 +56,10 @@ struct Cli {
     #[arg(short, long, value_name = "FILE")]
     output: Option<PathBuf>,
 }
-fn generate_image(scene: &Scene, width: u32, height: u32, tx: impl RenderListener) -> RgbImage {
-    let renderer = TraceRenderer::new();
+fn generate_image(scene: &Scene, width: u32, height: u32, tx: impl RenderListener, parallel: bool) -> RgbImage {
+    let renderer = TraceRenderer::new(TraceRenderConfig {
+        parallel
+    });
     
     renderer.render(scene, width, height, tx)
 }
@@ -177,18 +182,18 @@ fn main() {
                 let btx = BufferedChannel::new(min(cli.video_frames as usize, cli.video_buffer as usize), move |m|tx.send_blocking(m).unwrap());
                 for i in 0..cli.video_frames {
                     let scene = create_scene(i);
-                    let image = generate_image(&scene, cli.width, cli.height, |_m| {});
+                    let image = generate_image(&scene, cli.width, cli.height, |_m| {}, cli.parallel);
 
                     btx.send(ShowImage(image)).unwrap()
                 }
             } else {
                 let scene = create_scene(0);
-                generate_image(&scene, cli.width, cli.height, |(x, y, c)|tx.send_blocking(ShowPixelMessage(x, y, c)).unwrap());
+                generate_image(&scene, cli.width, cli.height, |(x, y, c)|tx.send_blocking(ShowPixelMessage(x, y, c)).unwrap(), cli.parallel);
             }
         })
     } else {
         let scene = create_scene(0);
-        let image = generate_image(&scene, cli.width, cli.height, |_m| {});
+        let image = generate_image(&scene, cli.width, cli.height, |_m| {}, cli.parallel);
         if let Some(output_path) = cli.output {
             image.save(output_path).expect("Failed to save image");
         } else {

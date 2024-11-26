@@ -70,8 +70,8 @@ impl Camera {
         Rgb(color.0.map(|x| (x * 255.0) as u8))
     }
 
-    pub fn take_photo(&self, caster: &impl RayCaster, on_trace: impl Fn((u32, u32, Rgb<u8>)) + Send + Sync) -> RgbImage {
-        RgbImage::from_par_fn(self.width, self.height, |x, y| {
+    pub fn take_photo(&self, caster: &impl RayCaster, on_trace: impl Fn((u32, u32, Rgb<u8>)) + Send + Sync, parallel: bool) -> RgbImage {
+        (if parallel { RgbImage::from_par_fn } else { RgbImage::from_fn })(self.width, self.height, |x, y| {
             let rgb = self.trace_pixel(caster, x, y);
             on_trace((x, y, rgb));
             rgb

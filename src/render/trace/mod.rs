@@ -10,11 +10,18 @@ use std::time::Instant;
 pub mod world;
 pub mod camera;
 
-pub struct TraceRenderer;
+pub struct TraceRenderer {
+    config: TraceRenderConfig
+}
 
+pub struct TraceRenderConfig {
+    pub parallel: bool,
+}
 impl TraceRenderer {
-    pub fn new() -> TraceRenderer {
-        TraceRenderer
+    pub fn new(config: TraceRenderConfig) -> TraceRenderer {
+        TraceRenderer {
+            config
+        }
     }
 }
 impl Renderer for TraceRenderer {
@@ -24,7 +31,7 @@ impl Renderer for TraceRenderer {
         let camera = Camera::new(camera_base, width, height, 50.0);
 
         let photo_start_time = Instant::now();
-        let image = camera.take_photo(&world, tx);
+        let image = camera.take_photo(&world, tx, self.config.parallel);
         let photo_duration = photo_start_time.elapsed();
         println!("Photo generation completed in: {:?}", photo_duration);
         image
