@@ -1,11 +1,11 @@
 use nalgebra::Unit;
-use crate::algebra::{Vector3, Matrix4, Point3};
+use crate::algebra::{Vector3, Matrix4, Point3, Frame};
 use crate::algebra::Ray;
 
 #[derive(Debug, Clone)]
 pub struct Transform {
-    pub matrix: Matrix4,        // Transformation matrix (world space)
-    pub inverse_matrix: Matrix4, // Precomputed inverse matrix (for local space)
+    pub matrix: Frame,        // Transformation matrix (world space)
+    pub inverse_matrix: Frame, // Precomputed inverse matrix (for local space)
     scale: f64 // Precomputed scale
 }
 
@@ -18,9 +18,13 @@ impl Transform {
         let scaling = Matrix4::new_nonuniform_scaling(&scale.into());
 
         let matrix = translation * rotation * scaling;
-        let inverse_matrix = matrix.try_inverse().expect("Matrix must be invertible");
-
-        Self { matrix, inverse_matrix, scale: Transform::calc_scale(&matrix) }
+        let frame = Frame::from_matrix(matrix);
+        
+        Self { 
+            matrix: frame, 
+            inverse_matrix: Frame::from_matrix(matrix.try_inverse().unwrap()), 
+            scale: frame.scale()
+        }
     }
 
     /// Applies the transform to a point in local space.
@@ -30,33 +34,13 @@ impl Transform {
 
     /// Converts a ray to local space.
     pub fn to_local_ray(&self, ray: &Ray) -> Ray {
-        let origin = self.inline_transform_point(&ray.origin);
-        let direction = self.inline_transform_vector(&ray.direction);
-
-        Ray::new(origin, direction)
+        self.inverse_matrix.transform_ray(&ray)
     }
 
     pub fn apply_to_distance(&self, distance: f64) -> f64 {
         distance * self.scale
     }
     
-    fn inline_transform_point(&self, point: &Point3) -> Point3 {
-        let p = self.inverse_matrix;
-        Point3::new(
-            p[(0, 0)] * point.x + p[(0, 1)] * point.y + p[(0, 2)] * point.z + p[(0, 3)],
-            p[(1, 0)] * point.x + p[(1, 1)] * point.y + p[(1, 2)] * point.z + p[(1, 3)],
-            p[(2, 0)] * point.x + p[(2, 1)] * point.y + p[(2, 2)] * point.z + p[(2, 3)],
-        )
-    }
-
-    fn inline_transform_vector(&self, vector: &Vector3) -> Vector3 {
-        let p = self.inverse_matrix;
-        Vector3::new(
-            p[(0, 0)] * vector.x + p[(0, 1)] * vector.y + p[(0, 2)] * vector.z,
-            p[(1, 0)] * vector.x + p[(1, 1)] * vector.y + p[(1, 2)] * vector.z,
-            p[(2, 0)] * vector.x + p[(2, 1)] * vector.y + p[(2, 2)] * vector.z,
-        )
-    }
     fn rotation_matrix(rotation: Vector3) -> Matrix4 {
         let angle = rotation.magnitude();
         if angle.abs() < 1e-6 {
@@ -67,13 +51,6 @@ impl Transform {
         Matrix4::from_axis_angle(&axis, angle)
     }
     
-    fn calc_scale(matrix: &Matrix4) -> f64 {
-        let sx = matrix[(0, 0)].abs();
-        let sy = matrix[(1, 1)].abs();
-        let sz = matrix[(2, 2)].abs();
-        sx.max(sy).max(sz) // Maximum for non-uniform scaling
-    }
-
     fn rotation_from_axis_angle(axis: Vector3, angle: f64) -> Vector3 {
         // Compute the rotation as a quaternion or Euler angles
         // (For simplicity, this returns Euler angles; use a quaternion for more precision)

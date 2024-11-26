@@ -1,5 +1,8 @@
 mod bounding;
 mod ray;
+mod frame;
+
+pub use frame::Frame;
 pub use ray::Ray;
 pub use bounding::{BoundingBox, Bounded};
 use nalgebra::Vector3 as NVector3;

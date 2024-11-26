@@ -22,19 +22,23 @@ mod render;
 mod buffer;
 
 /// Command-line interface for the raytracer application.
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[command(version, about = "A raytracer application with optional video and visualization modes.")]
 struct Cli {
     /// Width of the output image or video frame
-    #[arg(short, long, default_value_t = 3840)]
+    #[arg(long, default_value_t = 3840)]
     width: u32,
 
     /// Height of the output image or video frame
-    #[arg(short, long, default_value_t = 1920)]
+    #[arg(long, default_value_t = 1920)]
     height: u32,
 
     #[arg(long = "no-parallel", action = clap::ArgAction::SetFalse, default_value_t = true)]
     parallel: bool,
+
+    /// Enables visualization mode
+    #[arg(long = "visualize", default_value_t = false)]
+    visualize: bool,
 
     /// Number of frames to generate for video mode
     #[arg(short = 'f', long, default_value_t = 64, requires = "video")]
@@ -44,12 +48,9 @@ struct Cli {
     #[arg(short, long, default_value_t = 1, requires = "video")]
     video_buffer: u32,
 
-    /// Enables visualization mode
-    #[arg(long)]
-    visualize: bool,
 
     /// Enables video mode
-    #[arg(long)]
+    #[arg(long, default_value_t = false)]
     video: bool,
 
     /// Path to save the generated image (ignored in visualization or video mode)
@@ -194,10 +195,8 @@ fn main() {
     } else {
         let scene = create_scene(0);
         let image = generate_image(&scene, cli.width, cli.height, |_m| {}, cli.parallel);
-        if let Some(output_path) = cli.output {
-            image.save(output_path).expect("Failed to save image");
-        } else {
-            println!("No output file specified. Run with --help for usage instructions.");
-        }
+        let output_path = cli.output.unwrap_or(PathBuf::from("output.png"));
+
+        image.save(output_path).expect("Failed to save image");
     }
 }

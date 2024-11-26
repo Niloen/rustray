@@ -84,6 +84,7 @@ impl Processor {
 pub fn show(width: i32, height: i32, f: impl Fn(Sender<ShowMessage>) + Copy + Send + 'static) {
     let app = Application::builder()
         .application_id("org.example.RealtimeRenderer")
+        .flags(gio::ApplicationFlags::NON_UNIQUE)
         .build();
 
     app.connect_activate(move |app| {
@@ -128,7 +129,8 @@ pub fn show(width: i32, height: i32, f: impl Fn(Sender<ShowMessage>) + Copy + Se
         });
     });
 
-    app.run();
+    println!("Running app");
+    app.run_with_args(&Vec::<String>::new());
 
     ()
 }
