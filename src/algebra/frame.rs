@@ -1,6 +1,7 @@
 use crate::algebra::{Matrix4, Point3, Ray, Vector3};
 
 #[derive(Debug, Clone, Copy)]
+#[repr(align(32))]
 pub struct Frame {
     pub x_axis: Vector3, // Represents the first column (basis vector X)
     pub y_axis: Vector3, // Represents the second column (basis vector Y)
@@ -16,23 +17,25 @@ impl Frame {
         let z_axis = Vector3::new(transform_matrix[(0, 2)], transform_matrix[(1, 2)], transform_matrix[(2, 2)]);
         let translation = Point3::new(transform_matrix[(0, 3)], transform_matrix[(1, 3)], transform_matrix[(2, 3)]);
 
-        Frame {
+        Frame::from_vectors(
             x_axis,
             y_axis,
             z_axis,
-            origin: translation,
-        }
+            translation,
+        )
     }
-    
+
+
+
     /// Creates a Frame from rotation and translation.
     #[allow(dead_code)]
     pub fn from_rotation_translation(rotation: [Vector3; 3], translation: Point3) -> Self {
-        Self {
-            x_axis: rotation[0],
-            y_axis: rotation[1],
-            z_axis: rotation[2],
-            origin: translation,
-        }
+        Frame::from_vectors(
+            rotation[0],
+            rotation[1],
+            rotation[2],
+            translation
+        )
     }
 
     /// Constructs a Frame from position, forward, up, and right vectors.
@@ -41,12 +44,17 @@ impl Frame {
         let z_axis = forward.normalize();
         let x_axis = up.cross(&z_axis).normalize();
         let y_axis = z_axis.cross(&x_axis).normalize();
-        Self {
+        
+        Frame::from_vectors(
             x_axis,
             y_axis,
             z_axis,
-            origin,
-        }
+            origin
+        )
+    }
+
+    pub fn from_vectors(x_axis: Vector3, y_axis: Vector3, z_axis: Vector3, origin: Point3) -> Self {
+        Self { x_axis, y_axis, z_axis, origin }
     }
 }
 
@@ -61,14 +69,15 @@ impl Frame {
     }
 
     /// Transforms a point to world space.
+    #[inline(never)]
     pub fn transform_point(&self, point: &Point3) -> Point3 {
         self.origin
             + self.x_axis * point.x
             + self.y_axis * point.y
             + self.z_axis * point.z
     }
-
     /// Transforms a vector to world space.
+    #[inline(never)]
     pub fn transform_vector(&self, vector: &Vector3) -> Vector3 {
         self.x_axis * vector.x + self.y_axis * vector.y + self.z_axis * vector.z
     }
@@ -86,12 +95,12 @@ impl Frame {
     /// Combines two frames: self * other.
     #[allow(dead_code)]
     pub fn combine(&self, other: &Frame) -> Self {
-        Self {
-            x_axis: self.transform_vector(&other.x_axis),
-            y_axis: self.transform_vector(&other.y_axis),
-            z_axis: self.transform_vector(&other.z_axis),
-            origin: self.transform_point(&other.origin),
-        }
+        Frame::from_vectors(
+            self.transform_vector(&other.x_axis),
+            self.transform_vector(&other.y_axis),
+            self.transform_vector(&other.z_axis),
+            self.transform_point(&other.origin)
+        )
     }
 
     /// Inverts the frame (useful for local-to-world or world-to-local conversions).
@@ -108,12 +117,11 @@ impl Frame {
             self.origin.coords.dot(&inv_z),
         );
 
-        Self {
-            x_axis: inv_x,
-            y_axis: inv_y,
-            z_axis: inv_z,
-            origin: inv_origin,
-        }
+        Frame::from_vectors(
+            inv_x,
+            inv_y,
+            inv_z,
+            inv_origin
+        )
     }
-
 }
