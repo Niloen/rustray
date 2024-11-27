@@ -1,12 +1,12 @@
-use nalgebra::Unit;
-use crate::algebra::{Vector3, Matrix4, Point3, Frame};
 use crate::algebra::Ray;
+use crate::algebra::{Frame, Matrix4, Point3, Vector3};
+use nalgebra::Unit;
 
 #[derive(Debug, Clone)]
 pub struct Transform {
-    pub matrix: Frame,        // Transformation matrix (world space)
+    pub matrix: Frame,         // Transformation matrix (world space)
     pub inverse_matrix: Frame, // Precomputed inverse matrix (for local space)
-    scale: f64 // Precomputed scale
+    scale: f64,                // Precomputed scale
 }
 
 impl Transform {
@@ -19,11 +19,11 @@ impl Transform {
 
         let matrix = translation * rotation * scaling;
         let frame = Frame::from_matrix(matrix);
-        
-        Self { 
-            matrix: frame, 
+
+        Self {
+            matrix: frame,
             inverse_matrix: frame.inverse(),
-            scale: frame.scale()
+            scale: frame.scale(),
         }
     }
 
@@ -32,15 +32,17 @@ impl Transform {
         self.matrix.transform_point(point)
     }
 
-    /// Converts a ray to local space.
     pub fn to_local_ray(&self, ray: &Ray) -> Ray {
-        self.inverse_matrix.transform_ray(&ray)
+        Ray::from_normalized(
+            self.inverse_matrix.transform_point(&ray.origin),
+            self.inverse_matrix.transform_vector(&ray.direction) * self.scale,
+        )
     }
 
     pub fn apply_to_distance(&self, distance: f64) -> f64 {
         distance * self.scale
     }
-    
+
     fn rotation_matrix(rotation: Vector3) -> Matrix4 {
         let angle = rotation.magnitude();
         if angle.abs() < 1e-6 {
@@ -50,7 +52,7 @@ impl Transform {
         let axis = Unit::new_normalize(rotation);
         Matrix4::from_axis_angle(&axis, angle)
     }
-    
+
     fn rotation_from_axis_angle(axis: Vector3, angle: f64) -> Vector3 {
         // Compute the rotation as a quaternion or Euler angles
         // (For simplicity, this returns Euler angles; use a quaternion for more precision)
@@ -65,7 +67,9 @@ impl Transform {
             Vector3::zeros() // No rotation needed
         } else if v1_normalized == -v2_normalized {
             // Dynamically choose a vector not aligned with v1
-            let arbitrary_axis = if v1_normalized.x.abs() < v1_normalized.y.abs() && v1_normalized.x.abs() < v1_normalized.z.abs() {
+            let arbitrary_axis = if v1_normalized.x.abs() < v1_normalized.y.abs()
+                && v1_normalized.x.abs() < v1_normalized.z.abs()
+            {
                 Vector3::new(1.0, 0.0, 0.0) // Use x-axis if v1 is not aligned with x
             } else if v1_normalized.y.abs() < v1_normalized.z.abs() {
                 Vector3::new(0.0, 1.0, 0.0) // Use y-axis if v1 is not aligned with y

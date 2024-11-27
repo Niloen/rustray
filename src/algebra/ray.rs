@@ -9,9 +9,16 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(origin: Point3, direction: Vector3) -> Ray {
+        Ray::from_normalized(
+            origin,
+            direction.normalize()
+        )
+    }
+    
+    pub fn from_normalized(origin: Point3, direction: Vector3) -> Self {
         Ray {
             origin,
-            direction: direction.normalize(),
+            direction
         }
     }
     pub fn at(&self, distance: f64) -> Point3 {

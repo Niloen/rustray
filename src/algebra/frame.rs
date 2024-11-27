@@ -1,4 +1,4 @@
-use crate::algebra::{Matrix4, Point3, Ray, Vector3};
+use crate::algebra::{Matrix4, Point3, Vector3};
 
 #[derive(Debug, Clone, Copy)]
 #[repr(align(32))]
@@ -80,14 +80,6 @@ impl Frame {
     #[inline(never)]
     pub fn transform_vector(&self, vector: &Vector3) -> Vector3 {
         self.x_axis * vector.x + self.y_axis * vector.y + self.z_axis * vector.z
-    }
-
-    /// Transforms a ray to world space.
-    pub fn transform_ray(&self, ray: &Ray) -> Ray {
-        Ray::new(
-            self.transform_point(&ray.origin),
-            self.transform_vector(&ray.direction)
-        )
     }
 }
 
