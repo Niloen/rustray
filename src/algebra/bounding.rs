@@ -55,22 +55,28 @@ impl BoundingBox {
 
     /// Checks if the bounding box intersects a ray.
     pub fn intersects_ray(&self, ray: &Ray) -> bool {
-        let inv_dir = Vector3::new(
-            1.0 / ray.direction.x,
-            1.0 / ray.direction.y,
-            1.0 / ray.direction.z,
-        );
+        let mut t_near = f64::NEG_INFINITY;
+        let mut t_far = f64::INFINITY;
 
-        let tmin = (self.min.coords - ray.origin.coords).component_mul(&inv_dir);
-        let tmax = (self.max.coords - ray.origin.coords).component_mul(&inv_dir);
+        for i in 0..3 {
+            let inv_d = 1.0 / ray.direction[i];
+            let t0 = (self.min[i] - ray.origin[i]) * inv_d;
+            let t1 = (self.max[i] - ray.origin[i]) * inv_d;
 
-        let t1 = tmin.inf(&tmax); // Component-wise min
-        let t2 = tmin.sup(&tmax); // Component-wise max
+            // Ensure t0 is the min and t1 is the max
+            let (t0, t1) = if inv_d < 0.0 { (t1, t0) } else { (t0, t1) };
 
-        let t_near = t1.max();
-        let t_far = t2.min();
+            t_near = t_near.max(t0);
+            t_far = t_far.min(t1);
 
-        t_near <= t_far && t_far >= 0.0
+            // Early exit: If t_near is greater than t_far, there's no intersection
+            if t_near > t_far {
+                return false;
+            }
+        }
+
+        // Ensure the intersection is in the positive ray direction
+        t_far >= 0.0
     }
 
     /// Computes the center point of the bounding box.
