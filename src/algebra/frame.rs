@@ -116,4 +116,28 @@ impl Frame {
             inv_origin
         )
     }
+
+    /// Computes a prescaled inverse frame that incorporates scaling.
+    pub fn prescaled_inverse(&self, scale: Vector3) -> Self {
+        // Compute scaled axes by dividing by their respective scale factors
+        let scaled_x_axis = self.x_axis / scale.x;
+        let scaled_y_axis = self.y_axis / scale.y;
+        let scaled_z_axis = self.z_axis / scale.z;
+
+        // Compute inverse origin using scaled axes
+        let scaled_origin = -Point3::new(
+            self.origin.coords.dot(&scaled_x_axis),
+            self.origin.coords.dot(&scaled_y_axis),
+            self.origin.coords.dot(&scaled_z_axis),
+        );
+
+        // Return the new prescaled inverse frame
+        Frame {
+            x_axis: scaled_x_axis,
+            y_axis: scaled_y_axis,
+            z_axis: scaled_z_axis,
+            origin: scaled_origin,
+        }
+    }
+
 }

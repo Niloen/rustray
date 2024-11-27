@@ -6,6 +6,7 @@ use nalgebra::Unit;
 pub struct Transform {
     pub matrix: Frame,         // Transformation matrix (world space)
     pub inverse_matrix: Frame, // Precomputed inverse matrix (for local space)
+    pub prescaled_inverse_matrix: Frame, // Add prescaled inverse matrix
     scale: f64,                // Precomputed scale
 }
 
@@ -23,6 +24,7 @@ impl Transform {
         Self {
             matrix: frame,
             inverse_matrix: frame.inverse(),
+            prescaled_inverse_matrix: frame.prescaled_inverse(scale),
             scale: frame.scale(),
         }
     }
@@ -35,7 +37,7 @@ impl Transform {
     pub fn to_local_ray(&self, ray: &Ray) -> Ray {
         Ray::from_normalized(
             self.inverse_matrix.transform_point(&ray.origin),
-            self.inverse_matrix.transform_vector(&ray.direction) * self.scale,
+            self.prescaled_inverse_matrix.transform_vector(&ray.direction),
         )
     }
 
