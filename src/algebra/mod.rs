@@ -9,7 +9,7 @@ use nalgebra::Vector3 as NVector3;
 use nalgebra::Matrix4 as NMatrix4;
 use nalgebra::Point3 as NPoint3;
 
-pub type Distance = f32;
+pub type Distance = f64;
 pub type Vector3 = NVector3<Distance>;
 pub type Matrix4 = NMatrix4<Distance>;
 pub type Point3 = NPoint3<Distance>;
