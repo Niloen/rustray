@@ -83,8 +83,11 @@ impl RayCaster for World {
         let mut c = Rgb([0.0, 0.0, 0.0]);
 
         for l in self.lights.iter() {
-            if !self.is_shadowed(normal_ray.at(0.0001), l) {
-                c = c.map2(&l.illuminate(normal_ray.origin, normal_ray.direction), |x1, x2| min(1.0, x1 + x2))
+            let color = l.illuminate(normal_ray.origin, normal_ray.direction);
+            if color != World::BLACK {
+                if !self.is_shadowed(normal_ray.at(0.0001), l) {
+                    c = c.map2(&color, |x1, x2| min(1.0, x1 + x2))
+                }
             }
         }
 
@@ -93,6 +96,8 @@ impl RayCaster for World {
 }
 
 impl World {
+    const BLACK: Rgb<f64> = Rgb([0.0, 0.0, 0.0]);
+
     fn is_shadowed(&self, position: Point3, light: &Light) -> bool {
         self.is_something_within_distance(&light.towards(position), light.distance_to(position))
     }
