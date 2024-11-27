@@ -25,6 +25,7 @@ impl Frame {
     }
     
     /// Creates a Frame from rotation and translation.
+    #[allow(dead_code)]
     pub fn from_rotation_translation(rotation: [Vector3; 3], translation: Point3) -> Self {
         Self {
             x_axis: rotation[0],
@@ -35,6 +36,7 @@ impl Frame {
     }
 
     /// Constructs a Frame from position, forward, up, and right vectors.
+    #[allow(dead_code)]
     pub fn look_at(origin: Point3, forward: Vector3, up: Vector3) -> Self {
         let z_axis = forward.normalize();
         let x_axis = up.cross(&z_axis).normalize();
