@@ -24,16 +24,6 @@ impl Frame {
         }
     }
     
-    /// Creates an identity Frame (no rotation, scaling, or translation).
-    pub fn identity() -> Self {
-        Self {
-            x_axis: Vector3::new(1.0, 0.0, 0.0),
-            y_axis: Vector3::new(0.0, 1.0, 0.0),
-            z_axis: Vector3::new(0.0, 0.0, 1.0),
-            origin: Point3::origin()
-        }
-    }
-
     /// Creates a Frame from rotation and translation.
     pub fn from_rotation_translation(rotation: [Vector3; 3], translation: Point3) -> Self {
         Self {
@@ -92,6 +82,7 @@ impl Frame {
 
 impl Frame {
     /// Combines two frames: self * other.
+    #[allow(dead_code)]
     pub fn combine(&self, other: &Frame) -> Self {
         Self {
             x_axis: self.transform_vector(&other.x_axis),
@@ -103,14 +94,18 @@ impl Frame {
 
     /// Inverts the frame (useful for local-to-world or world-to-local conversions).
     pub fn inverse(&self) -> Self {
-        let inv_x = self.x_axis.normalize();
-        let inv_y = self.y_axis.normalize();
-        let inv_z = self.z_axis.normalize();
+        // Compute scale factors
+        let inv_x = self.x_axis / self.x_axis.magnitude_squared();
+        let inv_y = self.y_axis / self.y_axis.magnitude_squared();
+        let inv_z = self.z_axis / self.z_axis.magnitude_squared();
+
+        // Compute new origin by projecting onto the inverted axes
         let inv_origin = -Point3::new(
             self.origin.coords.dot(&inv_x),
             self.origin.coords.dot(&inv_y),
             self.origin.coords.dot(&inv_z),
         );
+
         Self {
             x_axis: inv_x,
             y_axis: inv_y,
@@ -118,4 +113,5 @@ impl Frame {
             origin: inv_origin,
         }
     }
+
 }

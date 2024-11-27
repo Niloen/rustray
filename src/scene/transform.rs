@@ -22,7 +22,7 @@ impl Transform {
         
         Self { 
             matrix: frame, 
-            inverse_matrix: Frame::from_matrix(matrix.try_inverse().unwrap()), 
+            inverse_matrix: frame.inverse(),
             scale: frame.scale()
         }
     }

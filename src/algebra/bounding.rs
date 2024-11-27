@@ -1,7 +1,7 @@
+use crate::algebra::{Point3, Ray};
+use crate::algebra::Point3Ops;
 use std::fmt;
 use std::sync::Arc;
-use crate::algebra::{Point3Ops, Vector3};
-use crate::algebra::{Point3, Ray};
 
 #[derive(Debug, Copy, Clone)]
 pub struct BoundingBox {
