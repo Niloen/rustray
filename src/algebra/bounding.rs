@@ -1,4 +1,4 @@
-use crate::algebra::{Point3, Ray};
+use crate::algebra::{Distance, Point3, Ray};
 use crate::algebra::Point3Ops;
 use std::fmt;
 use std::sync::Arc;
@@ -14,8 +14,8 @@ impl BoundingBox {
     /// This is useful for initializing a bounding box that will be expanded later.
     pub fn empty() -> Self {
         Self {
-            min: Point3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY),
-            max: Point3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY),
+            min: Point3::new(Distance::INFINITY, Distance::INFINITY, Distance::INFINITY),
+            max: Point3::new(Distance::NEG_INFINITY, Distance::NEG_INFINITY, Distance::NEG_INFINITY),
         }
     }
 
@@ -26,11 +26,11 @@ impl BoundingBox {
     }
 
     pub fn is_infinite(&self) -> bool {
-        return self.min.iter().any(|v|*v == f64::MIN) || self.max.iter().any(|v|*v == f64::MAX); 
+        return self.min.iter().any(|v|*v == Distance::MIN) || self.max.iter().any(|v|*v == Distance::MAX);
     }
     
     /// Expands the bounding box by a given loose factor.
-    pub fn expand_by_factor(&self, factor: f64) -> Self {
+    pub fn expand_by_factor(&self, factor: Distance) -> Self {
         let center = self.center();
         let half_size = (self.max - self.min) * 0.5 * factor;
 
@@ -55,8 +55,8 @@ impl BoundingBox {
 
     /// Checks if the bounding box intersects a ray.
     pub fn intersects_ray(&self, ray: &Ray) -> bool {
-        let mut t_near = f64::NEG_INFINITY;
-        let mut t_far = f64::INFINITY;
+        let mut t_near = Distance::NEG_INFINITY;
+        let mut t_far = Distance::INFINITY;
 
         for i in 0..3 {
             let inv_d = 1.0 / ray.direction[i];

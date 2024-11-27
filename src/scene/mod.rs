@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use image::Rgb;
 use crate::scene::light::Light;
 
 pub mod geometry;
@@ -9,6 +10,9 @@ pub mod surface;
 mod transform;
 pub mod object;
 pub mod ray;
+
+pub type ColorPart = f32;
+pub type Color = Rgb<ColorPart>;
 
 pub struct Scene {
     objects: Vec<Arc<object::Object>>,

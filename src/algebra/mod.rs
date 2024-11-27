@@ -9,15 +9,27 @@ use nalgebra::Vector3 as NVector3;
 use nalgebra::Matrix4 as NMatrix4;
 use nalgebra::Point3 as NPoint3;
 
-pub type Vector3 = NVector3<f64>;
-pub type Matrix4 = NMatrix4<f64>;
-pub type Point3 = NPoint3<f64>;
+pub type Distance = f32;
+pub type Vector3 = NVector3<Distance>;
+pub type Matrix4 = NMatrix4<Distance>;
+pub type Point3 = NPoint3<Distance>;
+
+pub trait DistanceConstants<T> {
+    const PI: T;
+}
+impl DistanceConstants<f32> for f32 {
+    const PI: f32 = std::f32::consts::PI;
+}
+
+impl DistanceConstants<f64> for f64 {
+    const PI: f64 = std::f64::consts::PI;
+}
 
 pub trait VectorOps {
     #[allow(dead_code)]
     fn perpendicular(&self) -> Vector3;
 
-    fn cos_angle(&self, v: &Vector3) -> f64;
+    fn cos_angle(&self, v: &Vector3) -> Distance;
 }
 
 impl VectorOps for Vector3 {
@@ -32,7 +44,7 @@ impl VectorOps for Vector3 {
         }
     }
 
-    fn cos_angle(&self, v: &Vector3) -> f64 {
+    fn cos_angle(&self, v: &Vector3) -> Distance {
         self.dot(v) / (self.magnitude() * v.magnitude())
     }
 }

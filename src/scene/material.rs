@@ -1,25 +1,26 @@
 use crate::scene::geometry::HitResult;
-use crate::algebra::Ray;
+use crate::algebra::{Distance, Ray};
 use crate::scene::ray::RayCaster;
 use image::{Pixel, Rgb};
 use std::fmt::Debug;
+use crate::scene::{Color, ColorPart};
 
 pub trait Material: Send + Sync + Debug {
     /// Calculates the color for the material at an intersection point.
     /// Takes the ray that hit the object, the hit result, the ray caster function, and the recursion depth.
-    fn shade(&self, ray: &Ray, hit: &HitResult, color: Rgb<f64>, caster: &dyn RayCaster, depth: u32) -> Rgb<f64>;
+    fn shade(&self, ray: &Ray, hit: &HitResult, color: Color, caster: &dyn RayCaster, depth: u32) -> Color;
     fn clone_box(&self) -> Box<dyn Material>;
 }
 
 #[derive(Debug, Clone)]
 pub struct BaseMaterial {
-    pub reflectivity: f64,   // 0 for diffuse, higher values for reflective
-    pub emission: Rgb<f64>,  // Non-zero values make the material emissive
-    pub refractive: f64
+    pub reflectivity: ColorPart,   // 0 for diffuse, higher values for reflective
+    pub emission: Color,  // Non-zero values make the material emissive
+    pub refractive: Distance
 }
 
 impl Material for BaseMaterial {
-    fn shade(&self, ray: &Ray, hit: &HitResult, color: Rgb<f64>, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
+    fn shade(&self, ray: &Ray, hit: &HitResult, color: Color, caster: &dyn RayCaster, depth: u32) -> Color {
         // Basic shading logic with adjustable parameters
 
         let mut color = if self.reflectivity < 1.0 {
@@ -65,9 +66,9 @@ impl BaseMaterial {
         refractive: 1.0
     };
 
-    const BLACK: Rgb<f64> = Rgb([0.0, 0.0, 0.0]);
+    const BLACK: Color = Rgb([0.0, 0.0, 0.0]);
 
-    fn reflected_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Rgb<f64> {
+    fn reflected_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Color {
         let reflected_direction = ray.reflect(hit.normal).direction;
         // Adjust along normal to avoid self-intersection
         let reflected_ray = Ray::new(hit.position + hit.normal * 0.000001, reflected_direction);
@@ -75,8 +76,8 @@ impl BaseMaterial {
         reflected_color
     }
 
-    fn refracted_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32, refractive_index: f64) -> Rgb<f64> {
-        let n1 = 1.0; // Assuming ray originates in air with refractive index 1.0
+    fn refracted_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32, refractive_index: Distance) -> Color {
+        let n1: Distance = 1.0; // Assuming ray originates in air with refractive index 1.0
         let n2 = refractive_index;
 
         let cos_i = -hit.normal.dot(&ray.direction).max(-1.0).min(1.0);
@@ -96,7 +97,7 @@ impl BaseMaterial {
         }
 
         let cos_t = (1.0 - sin_t2).sqrt();
-        let refracted_direction = ray.direction * eta + normal * (eta * cos_i - cos_t);
+        let refracted_direction = ray.direction * eta as Distance + normal * (eta * cos_i - cos_t);
         let refracted_ray = Ray::new(hit.position - hit.normal * 0.000001, refracted_direction);
         caster.cast(&refracted_ray, depth - 1)
     }

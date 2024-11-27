@@ -1,4 +1,4 @@
-use crate::algebra::Ray;
+use crate::algebra::{Distance, Ray};
 use crate::algebra::{Bounded, BoundingBox, Point3, Vector3};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
 
@@ -7,7 +7,7 @@ pub struct Plane {
 
 impl Plane {
     pub(crate) const NORMAL: Vector3 = Vector3::new(0.0, 1.0, 0.0);
-    
+
     pub fn new() -> Self {
         Self {
         }
@@ -21,15 +21,15 @@ impl Plane {
 impl Bounded for Plane {
     fn bounding_box(&self) -> BoundingBox {
         BoundingBox::new(
-            Point3::new(f64::MIN, 0.0, f64::MIN), // Very large "min" corner
-            Point3::new(f64::MAX, 0.0, f64::MAX),   // Very large "max" corner
+            Point3::new(Distance::MIN, 0.0, Distance::MIN), // Very large "min" corner
+            Point3::new(Distance::MAX, 0.0, Distance::MAX),   // Very large "max" corner
         )
     }
 }
 
 
 impl Geometry for Plane {
-    fn distance(&self, ray: &Ray) -> Option<f64> {
+    fn distance(&self, ray: &Ray) -> Option<Distance> {
         // Simplify the denominator calculation using NORMAL = (0, 1, 0)
         let denom = ray.direction[1];
 

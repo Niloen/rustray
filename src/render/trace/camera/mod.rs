@@ -1,6 +1,6 @@
 extern crate image;
 
-use crate::algebra::Vector3;
+use crate::algebra::{Distance, Vector3};
 use crate::scene::ray::RayCaster;
 use crate::algebra::Ray;
 use image::{Rgb, RgbImage};
@@ -16,8 +16,8 @@ pub struct Camera {
 
 impl Camera {
 
-    pub fn new(base: Ray, width: u32, height: u32, fov: f64) -> Self {
-        let aspect_ratio = width as f64 / height as f64;
+    pub fn new(base: Ray, width: u32, height: u32, fov: Distance) -> Self {
+        let aspect_ratio = width as Distance / height as Distance;
         let fov_radians = (fov.to_radians()) / 2.0;
         let scale = fov_radians.tan();
 
@@ -27,16 +27,16 @@ impl Camera {
         let up = forward.cross(&right).normalize();
 
         // Calculate pixel step sizes
-        let pixel_width = 2.0 * aspect_ratio * scale / width as f64;
-        let pixel_height = 2.0 * scale / height as f64;
+        let pixel_width = 2.0 * aspect_ratio * scale / width as Distance;
+        let pixel_height = 2.0 * scale / height as Distance;
 
         // Precompute pixel step vectors
         let pixel_step_x = right * pixel_width;
         let pixel_step_y = -up * pixel_height; // Negative because y-axis is flipped in screen space
 
         // Compute the top-left corner of the camera plane
-        let half_width = width as f64 / 2.0;
-        let half_height = height as f64 / 2.0;
+        let half_width = width as Distance / 2.0;
+        let half_height = height as Distance / 2.0;
         let corner = forward
             - pixel_step_x * half_width
             - pixel_step_y * half_height;
@@ -56,8 +56,8 @@ impl Camera {
 
         // Compute the world direction for the current pixel
         let world_direction = self.corner
-            + self.pixel_step_x * x as f64
-            + self.pixel_step_y * y as f64;
+            + self.pixel_step_x * x as Distance
+            + self.pixel_step_y * y as Distance;
 
         Ray::new(self.base.origin, world_direction)
     }

@@ -1,14 +1,14 @@
-use image::Rgb;
+use crate::scene::Color;
 use crate::scene::material::Material;
 
 #[derive(Debug)]
 pub struct Surface {
-    pub color: Rgb<f64>,
+    pub color: Color,
     pub material: Box<dyn Material>,
 }
 
 impl Surface {
-    pub fn new(color: Rgb<f64>, material: &dyn Material) -> Self {
+    pub fn new(color: Color, material: &dyn Material) -> Self {
         Self { color, material: material.clone_box() }
     }
 }

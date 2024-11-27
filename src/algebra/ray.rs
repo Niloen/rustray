@@ -1,4 +1,4 @@
-use crate::algebra::{Point3, Vector3};
+use crate::algebra::{Distance, Point3, Vector3};
 
 #[derive(Debug, Copy, Clone)]
 #[non_exhaustive]
@@ -14,14 +14,14 @@ impl Ray {
             direction.normalize()
         )
     }
-    
+
     pub fn from_normalized(origin: Point3, direction: Vector3) -> Self {
         Ray {
             origin,
-            direction
+            direction,
         }
     }
-    pub fn at(&self, distance: f64) -> Point3 {
+    pub fn at(&self, distance: Distance) -> Point3 {
         self.origin + self.direction * distance
     }
 

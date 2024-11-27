@@ -1,4 +1,4 @@
-use crate::algebra::{Bounded, Point3, Vector3};
+use crate::algebra::{Bounded, Distance, Point3, Vector3};
 use crate::algebra::Ray;
 pub use sphere::Sphere;
 pub use cube::Cube;
@@ -8,7 +8,7 @@ mod sphere;
 mod cube;
 mod plane;
 
-pub type TextureCoords = (f64, f64);
+pub type TextureCoords = (Distance, Distance);
 
 #[derive(Debug)]
 pub struct HitResult {
@@ -19,7 +19,7 @@ pub struct HitResult {
 
 pub trait Geometry: Send + Sync + Bounded {
     
-    fn distance(&self, ray: &Ray) -> Option<f64>;
+    fn distance(&self, ray: &Ray) -> Option<Distance>;
 
     fn hit(&self, ray: &Ray) -> Option<HitResult>;
 }

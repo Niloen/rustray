@@ -1,19 +1,19 @@
-use std::path::PathBuf;
-use clap::Parser;
-use crate::algebra::{Point3, Vector3};
-use crate::visualize::show;
-use crate::visualize::ShowMessage::{ShowImage, ShowPixelMessage};
 use crate::algebra::Ray;
-use scene::texture::CheckerboardTexture;
-use image::{Rgb, RgbImage};
-use nalgebra::min;
+use crate::algebra::{Distance, Point3, Vector3};
 use crate::buffer::BufferedChannel;
 use crate::render::{RenderListener, Renderer, TraceRenderConfig, TraceRenderer};
 use crate::scene::light::Light;
 use crate::scene::material::BaseMaterial;
 use crate::scene::object::Object;
-use crate::scene::Scene;
 use crate::scene::surface::Surface;
+use crate::scene::Scene;
+use crate::visualize::show;
+use crate::visualize::ShowMessage::{ShowImage, ShowPixelMessage};
+use clap::Parser;
+use image::{Rgb, RgbImage};
+use nalgebra::min;
+use scene::texture::CheckerboardTexture;
+use std::path::PathBuf;
 
 mod algebra;
 mod visualize;
@@ -77,7 +77,7 @@ fn create_scene1(_frame: u32) -> Scene {
     scene.add_light(Light::new(Ray::new(Point3::new(-100.0, 0.0, 80.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([0.0, 0.0, 1.0])));
     scene.add(Object::sphere(Point3::new(0.0, 25.0, 100.0), 20.0, &Surface::new(Rgb([1.0, 1.0, 1.0]), &MAT)));
     for i in 1..=1000 {
-        let ifl = i as f64;
+        let ifl = i as Distance;
 
         scene.add(Object::sphere(Point3::new(20.0 + ifl, 0.5, 200.0 - ifl * 3.0), 50.0, &Surface::new(Rgb([1.0, 1.0, 1.0]), &MAT)));
     }
@@ -115,8 +115,8 @@ fn create_scene2(frame: u32) -> Scene {
     scene.add(Object::plane(Point3::new(0.0, 150.0, z + 0.0), Vector3::new(0.0, -1.0, 0.0), &checkerboard_texture2));
 
     scene.add(Object::sphere(Point3::new(20.0, 20.0, z + 100.0), 20.0, &Surface::new(white, &mirror)));
-    scene.add(Object::sphere(Point3::new(-50.0 + 4.0 * frame as f64, 20.0, z + 75.0), 40.0, &Surface::new(white, &mirror)));
-    scene.add(Object::sphere(Point3::new(200.0, (frame as f64 * 0.25).sin().abs() * 100.0 , z + 100.0), 100.0, &Surface::new(Rgb([1.0, 0.0, 0.0]), &mat)));
+    scene.add(Object::sphere(Point3::new(-50.0 + 4.0 * frame as Distance, 20.0, z + 75.0), 40.0, &Surface::new(white, &mirror)));
+    scene.add(Object::sphere(Point3::new(200.0, (frame as Distance * 0.25).sin().abs() * 100.0 , z + 100.0), 100.0, &Surface::new(Rgb([1.0, 0.0, 0.0]), &mat)));
 
     scene.add(Object::cube(Point3::new(-10.0, -25.0, z + 50.0), 20.0, &Surface::new(Rgb([0.0, 0.0, 1.0]), &mat)));
     scene.add(Object::cube(Point3::new(-50.0, -25.0, z + 120.0), 30.0, &Surface::new(Rgb([1.0, 1.0, 0.0]), &mat)));

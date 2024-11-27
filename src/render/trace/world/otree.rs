@@ -1,4 +1,4 @@
-use crate::algebra::{Bounded, BoundingBox, Ray};
+use crate::algebra::{Bounded, BoundingBox, Distance, Ray};
 use crate::render::trace::world::intersect::{Intersecting, Intersection};
 use std::fmt;
 use std::sync::Arc;
@@ -7,11 +7,11 @@ use std::sync::Arc;
 pub struct OctreeConfig {
     pub max_objects: usize,
     pub max_depth: usize,
-    pub loose_factor: f64,
+    pub loose_factor: Distance,
 }
 
 impl OctreeConfig {
-    pub fn new(max_objects: usize, max_depth: usize, loose_factor: f64) -> Self {
+    pub fn new(max_objects: usize, max_depth: usize, loose_factor: Distance) -> Self {
         Self {
             max_objects,
             max_depth,
@@ -113,7 +113,7 @@ impl OctreeNode {
 }
 
 impl Intersecting for OctreeNode {
-    fn closest_intersection(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+    fn closest_intersection(&self, ray: &Ray, max: Distance) -> Option<Intersection> {
         if !self.bounding_box.intersects_ray(ray) {
             return None;
         }
@@ -130,15 +130,15 @@ impl Intersecting for OctreeNode {
         result
     }
 
-    fn any_intersects(&self, ray: &Ray, max: f64) -> bool {
+    fn any_intersects(&self, ray: &Ray, max: Distance) -> bool {
         if !self.bounding_box.intersects_ray(ray) {
             return false;
         }
-        
+
         if self.objects.any_intersects(ray, max) {
             return true;
         }
-        
+
         self.children.any_intersects(ray, max)
     }
 }
@@ -195,7 +195,7 @@ impl Octree {
 }
 
 impl Intersecting for Octree {
-    fn closest_intersection(&self, ray: &Ray, max: f64) -> Option<Intersection> {
+    fn closest_intersection(&self, ray: &Ray, max: Distance) -> Option<Intersection> {
         // Start with the result from the objects in this node
         let mut result = self.root.closest_intersection(ray, max);
 
@@ -207,7 +207,7 @@ impl Intersecting for Octree {
         result
     }
 
-    fn any_intersects(&self, ray: &Ray, max: f64) -> bool {
+    fn any_intersects(&self, ray: &Ray, max: Distance) -> bool {
         if self.root.any_intersects(ray, max) {
             return true;
         }

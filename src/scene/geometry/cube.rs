@@ -1,4 +1,4 @@
-use crate::algebra::{Bounded, BoundingBox, Point3, Vector3};
+use crate::algebra::{Bounded, BoundingBox, Distance, Point3, Vector3};
 use crate::scene::geometry::{Geometry, HitResult};
 use crate::algebra::Ray;
 
@@ -36,10 +36,10 @@ impl Bounded for Cube {
 }
 
 impl Geometry for Cube {
-    fn distance(&self, ray: &Ray) -> Option<f64> {
+    fn distance(&self, ray: &Ray) -> Option<Distance> {
         // Initialize entry and exit distances
-        let mut t_min = f64::NEG_INFINITY;
-        let mut t_max = f64::INFINITY;
+        let mut t_min = Distance::NEG_INFINITY;
+        let mut t_max = Distance::INFINITY;
 
         // Check intersection along each axis
         for i in 0..3 {

@@ -1,4 +1,4 @@
-use crate::algebra::Ray;
+use crate::algebra::{Distance, DistanceConstants, Ray};
 use crate::algebra::{Bounded, BoundingBox, Point3};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
 use std::ops::Neg;
@@ -12,8 +12,8 @@ impl Sphere {
 
     fn texture_coords(&self, hit_position: &Point3) -> TextureCoords {
         // Assume the hit position is already on the unit sphere
-        let u = 0.5 + (hit_position.z.atan2(hit_position.x) / (2.0 * std::f64::consts::PI));
-        let v = 0.5 - (hit_position.y.asin() / std::f64::consts::PI);
+        let u = 0.5 + (hit_position.z.atan2(hit_position.x) / (2.0 * Distance::PI));
+        let v = 0.5 - (hit_position.y.asin() / Distance::PI);
         (u, v)
     }
 }
@@ -25,7 +25,7 @@ impl Bounded for Sphere {
 }
 
 impl Geometry for Sphere {
-    fn distance(&self, ray: &Ray) -> Option<f64> {
+    fn distance(&self, ray: &Ray) -> Option<Distance> {
         // Vector from ray origin to sphere center (center is always (0,0,0))
         let origin_to_center = ray.origin.coords;
 

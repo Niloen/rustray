@@ -1,4 +1,4 @@
-use crate::algebra::{Bounded, BoundingBox, Point3, Vector3};
+use crate::algebra::{Bounded, BoundingBox, Distance, Point3, Vector3};
 use crate::scene::geometry::{Cube, HitResult, Plane, Sphere};
 use crate::algebra::Ray;
 use crate::scene::texture::Texture;
@@ -21,14 +21,14 @@ impl Object {
         }
     }
 
-    pub fn sphere(center: Point3, radius: f64, texture: &dyn Texture) -> Self {
+    pub fn sphere(center: Point3, radius: Distance, texture: &dyn Texture) -> Self {
         Object::new(
             Sphere::new(),
             Transform::new(Vector3::new(center.x, center.y, center.z), Vector3::zeros(), Vector3::new(radius, radius, radius)),
             texture
         )
     }
-    pub fn cube(center: Point3, side_length: f64, texture: &dyn Texture) -> Self {
+    pub fn cube(center: Point3, side_length: Distance, texture: &dyn Texture) -> Self {
         Object::new(
             Cube::new(),
             Transform::new(Vector3::new(center.x, center.y, center.z), Vector3::zeros(), Vector3::new(side_length, side_length, side_length)),
@@ -75,10 +75,10 @@ impl Bounded for Object {
         // Find the new min and max points in world space
         let min = transformed_corners
             .iter()
-            .fold(Point3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY), |acc, p| acc.inf(p));
+            .fold(Point3::new(Distance::INFINITY, Distance::INFINITY, Distance::INFINITY), |acc, p| acc.inf(p));
         let max = transformed_corners
             .iter()
-            .fold(Point3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY), |acc, p| acc.sup(p));
+            .fold(Point3::new(Distance::NEG_INFINITY, Distance::NEG_INFINITY, Distance::NEG_INFINITY), |acc, p| acc.sup(p));
 
         // Create the transformed bounding box
         BoundingBox::new(min, max)
@@ -88,7 +88,7 @@ impl Bounded for Object {
 
 
 impl Geometry for Object {
-    fn distance(&self, ray: &Ray) -> Option<f64> {
+    fn distance(&self, ray: &Ray) -> Option<Distance> {
         let local_ray = self.transform.to_local_ray(ray);
 
         // Check for intersection in local space

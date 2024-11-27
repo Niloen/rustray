@@ -1,4 +1,4 @@
-use crate::algebra::Ray;
+use crate::algebra::{Distance, DistanceConstants, Ray};
 use crate::algebra::{Frame, Matrix4, Point3, Vector3};
 use nalgebra::Unit;
 
@@ -7,7 +7,7 @@ pub struct Transform {
     pub matrix: Frame,         // Transformation matrix (world space)
     pub inverse_matrix: Frame, // Precomputed inverse matrix (for local space)
     pub prescaled_inverse_matrix: Frame, // Add prescaled inverse matrix
-    scale: f64,                // Precomputed scale
+    scale: Distance,                // Precomputed scale
 }
 
 impl Transform {
@@ -41,7 +41,7 @@ impl Transform {
         )
     }
 
-    pub fn apply_to_distance(&self, distance: f64) -> f64 {
+    pub fn apply_to_distance(&self, distance: Distance) -> Distance {
         distance * self.scale
     }
 
@@ -55,7 +55,7 @@ impl Transform {
         Matrix4::from_axis_angle(&axis, angle)
     }
 
-    fn rotation_from_axis_angle(axis: Vector3, angle: f64) -> Vector3 {
+    fn rotation_from_axis_angle(axis: Vector3, angle: Distance) -> Vector3 {
         // Compute the rotation as a quaternion or Euler angles
         // (For simplicity, this returns Euler angles; use a quaternion for more precision)
         axis * angle
@@ -80,7 +80,7 @@ impl Transform {
             };
 
             let axis = v1_normalized.cross(&arbitrary_axis).normalize(); // Ensure orthogonality
-            Transform::rotation_from_axis_angle(axis, std::f64::consts::PI)
+            Transform::rotation_from_axis_angle(axis, Distance::PI)
         } else {
             let axis = v2_normalized.cross(&v1_normalized).normalize();
             let angle = v2_normalized.dot(&v1_normalized).acos();

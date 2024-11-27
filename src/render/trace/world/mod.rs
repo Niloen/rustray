@@ -1,4 +1,4 @@
-use crate::algebra::Point3;
+use crate::algebra::{Distance, Point3};
 use crate::algebra::Ray;
 use crate::render::trace::world::intersect::Intersection;
 use crate::render::trace::world::otree::{Octree, OctreeConfig};
@@ -6,7 +6,7 @@ pub use crate::scene::geometry::Geometry;
 pub use crate::scene::light::Light;
 pub use crate::scene::material::Material;
 pub use crate::scene::ray::RayCaster;
-use crate::scene::Scene;
+use crate::scene::{Color, ColorPart, Scene};
 use image::{Pixel, Rgb};
 use intersect::Intersecting;
 use std::sync::Arc;
@@ -20,7 +20,7 @@ pub struct World {
     lights: Vec<Light>,
 }
 
-fn min(v1: f64, v2: f64) -> f64 {
+fn min(v1: ColorPart, v2: ColorPart) -> ColorPart {
     if v1 < v2 {
         v1
     } else {
@@ -62,7 +62,7 @@ impl World {
 }
 
 impl RayCaster for World {
-    fn cast(&self, ray: &Ray, depth: u32) -> Rgb<f64> {
+    fn cast(&self, ray: &Ray, depth: u32) -> Color {
         if depth == 0 {
             return Rgb([0.0, 0.0, 0.0]);
         }
@@ -79,8 +79,8 @@ impl RayCaster for World {
             .unwrap_or(Rgb([0.0, 0.0, 0.0]))
     }
 
-    fn direct_lightning(&self, normal_ray: &Ray) -> Rgb<f64> {
-        let mut c = Rgb([0.0, 0.0, 0.0]);
+    fn direct_lightning(&self, normal_ray: &Ray) -> Color {
+        let mut c = Color::from([0.0 as ColorPart, 0.0, 0.0]);
 
         for l in self.lights.iter() {
             let color = l.illuminate(normal_ray.origin, normal_ray.direction);
@@ -96,16 +96,16 @@ impl RayCaster for World {
 }
 
 impl World {
-    const BLACK: Rgb<f64> = Rgb([0.0, 0.0, 0.0]);
+    const BLACK: Color = Rgb([0.0, 0.0, 0.0]);
 
     fn is_shadowed(&self, position: Point3, light: &Light) -> bool {
         self.is_something_within_distance(&light.towards(position), light.distance_to(position))
     }
 
-    fn is_something_within_distance(&self, ray: &Ray, distance: f64) -> bool {
+    fn is_something_within_distance(&self, ray: &Ray, distance: Distance) -> bool {
         self.root.any_intersects(&ray, distance)
     }
     fn cast_intersection(&self, ray: &Ray) -> Option<Intersection> {
-        self.root.closest_intersection(ray, f64::MAX)
+        self.root.closest_intersection(ray, Distance::MAX)
     }
 }

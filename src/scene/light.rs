@@ -1,17 +1,18 @@
 use image::{Pixel, Rgb};
-use crate::algebra::{Point3, Vector3, VectorOps};
+use crate::algebra::{Distance, Point3, Vector3, VectorOps};
 use crate::algebra::Ray;
+use crate::scene::{Color, ColorPart};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Light {
     pub ray: Ray,
-    pub color: Rgb<f64>,
+    pub color: Color,
 }
 
 impl Light {
-    const BLACK: Rgb<f64> = Rgb([0.0, 0.0, 0.0]);
+    const BLACK: Color = Rgb([0.0, 0.0, 0.0]);
     
-    pub fn new(ray: Ray, color: Rgb<f64>) -> Self {
+    pub fn new(ray: Ray, color: Color) -> Self {
         Light {
             ray,
             color
@@ -26,13 +27,13 @@ impl Light {
         self.ray.origin - position
     }
     
-    pub fn distance_to(&self, position: Point3) -> f64 {
+    pub fn distance_to(&self, position: Point3) -> Distance {
         return self.towards_direction(position).magnitude()
     }
     
-    pub fn illuminate(&self, position: Point3, normal: Vector3) -> Rgb<f64> {
+    pub fn illuminate(&self, position: Point3, normal: Vector3) -> Color {
         let direction_to_light = self.towards_direction(position);
-        let fraction = direction_to_light.cos_angle(&normal);
+        let fraction = direction_to_light.cos_angle(&normal) as ColorPart;
         
         if fraction <= 0.0 {
             return Self::BLACK;

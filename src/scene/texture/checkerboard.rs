@@ -1,3 +1,4 @@
+use crate::algebra::Distance;
 use crate::scene::geometry::TextureCoords;
 use crate::scene::surface::Surface;
 use crate::scene::texture::Texture;
@@ -6,11 +7,11 @@ use crate::scene::texture::Texture;
 pub struct CheckerboardTexture {
     surface1: Surface,
     surface2: Surface,
-    scale: f64, // Number of checkers per unit area
+    scale: Distance, // Number of checkers per unit area
 }
 
 impl CheckerboardTexture {
-    pub fn new(surface1: Surface, surface2: Surface, scale: f64) -> Self {
+    pub fn new(surface1: Surface, surface2: Surface, scale: Distance) -> Self {
         Self { surface1, surface2, scale }
     }
 }
