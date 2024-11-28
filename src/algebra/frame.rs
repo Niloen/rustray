@@ -1,4 +1,4 @@
-use crate::algebra::{Distance, Matrix4, Point3, Vector3};
+use crate::algebra::{Matrix4, Point3, Vector3};
 #[derive(Debug, Clone, Copy)]
 #[repr(align(32))]
 pub struct Frame {
@@ -6,6 +6,7 @@ pub struct Frame {
     pub y_axis: Vector3, // Represents the second column (basis vector Y)
     pub z_axis: Vector3, // Represents the third column (basis vector Z)
     pub origin: Point3,  // Translation (position in space)
+    pub scale: Vector3 // Scales of x,y,z
 }
 
 impl Frame {
@@ -57,20 +58,27 @@ impl Frame {
             y_axis,
             z_axis,
             origin,
+            scale: Vector3::new(x_axis.magnitude(), y_axis.magnitude(), z_axis.magnitude()),
         }
     }
 }
 
 impl Frame {
-    pub(crate) fn scale(&self) -> Distance {
-        let scale_x = self.x_axis.magnitude();
-        let scale_y = self.y_axis.magnitude();
-        let scale_z = self.z_axis.magnitude();
+    /// Computes the effective scaling fcameactor for the given vector.
+    /// This adjusts for non-uniform scaling when transforming distances back to world space.
+    ///
+    /// It is assumed that the vector v is normalized
+    pub fn scale_back_along(&self, v: &Vector3) -> f64 {
+        // Compute scaled vector components
+        let scaled = Vector3::new(
+            v.x * self.scale.x,
+            v.y * self.scale.y,
+            v.z * self.scale.z,
+        );
 
-        // Return the average scale, but you can choose min or max if needed.
-        (scale_x + scale_y + scale_z) / 3.0
+        // Return the magnitude of the scaled vector
+        scaled.magnitude()
     }
-
     /// Transforms a point to world space.
     #[inline(never)]
     pub fn transform_point(&self, point: &Point3) -> Point3 {
@@ -110,23 +118,5 @@ impl Frame {
         );
 
         Frame::from_vectors(inv_x, inv_y, inv_z, inv_origin)
-    }
-
-    /// Computes a prescaled inverse frame that incorporates scaling.
-    pub fn prescaled_inverse(&self, scale: Vector3) -> Self {
-        // Compute scaled axes by dividing by their respective scale factors
-        let scaled_x_axis = self.x_axis / scale.x;
-        let scaled_y_axis = self.y_axis / scale.y;
-        let scaled_z_axis = self.z_axis / scale.z;
-
-        // Compute inverse origin using scaled axes
-        let scaled_origin = -Point3::new(
-            self.origin.coords.dot(&scaled_x_axis),
-            self.origin.coords.dot(&scaled_y_axis),
-            self.origin.coords.dot(&scaled_z_axis),
-        );
-
-        // Return the new prescaled inverse frame
-        Frame::from_vectors(scaled_x_axis, scaled_y_axis, scaled_z_axis, scaled_origin)
     }
 }
