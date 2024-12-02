@@ -4,8 +4,11 @@ use nalgebra::Unit;
 
 #[derive(Debug, Clone)]
 pub struct Transform {
-    pub matrix: Frame,         // Transformation matrix (world space)
-    pub inverse_matrix: Frame, // Precomputed inverse matrix (for local space)
+    matrix: Frame,         // Transformation matrix (world space)
+    inverse_matrix: Frame, // Precomputed inverse matrix (for local space)
+}
+
+impl Transform {
 }
 
 impl Transform {
@@ -28,6 +31,10 @@ impl Transform {
     /// Applies the transform to a point in local space.
     pub fn apply_to_point(&self, point: &Point3) -> Point3 {
         self.matrix.transform_point(point)
+    }
+
+    pub(crate) fn apply_to_vector(&self, v: &Vector3) -> Vector3 {
+        self.matrix.transform_vector(v)
     }
 
     pub fn to_local_ray(&self, ray: &Ray) -> Ray {

@@ -104,7 +104,7 @@ impl Geometry for Object {
         let local_ray = self.transform.to_local_ray(ray);
         self.geometry.hit(&local_ray).map(|hr| HitResult {
             position: self.transform.apply_to_point(&hr.position),
-            normal: self.transform.matrix.transform_vector(&hr.normal).normalize(),
+            normal: self.transform.apply_to_vector(&hr.normal).normalize(),
                 ..hr
         })
     }
