@@ -114,7 +114,7 @@ impl OctreeNode {
 
 impl Intersecting for OctreeNode {
     fn closest_intersection(&self, ray: &Ray, max: Distance) -> Option<Intersection> {
-        if !self.bounding_box.intersects_ray(ray) {
+        if !self.bounding_box.intersects_ray(ray, max) {
             return None;
         }
 
@@ -131,7 +131,7 @@ impl Intersecting for OctreeNode {
     }
 
     fn any_intersects(&self, ray: &Ray, max: Distance) -> bool {
-        if !self.bounding_box.intersects_ray(ray) {
+        if !self.bounding_box.intersects_ray(ray, max) {
             return false;
         }
 

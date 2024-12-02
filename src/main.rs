@@ -36,6 +36,10 @@ struct Cli {
     #[arg(long = "no-parallel", action = clap::ArgAction::SetFalse, default_value_t = true)]
     parallel: bool,
 
+    /// Number of iterations to run with bench
+    #[arg(long, default_value_t = 1)]
+    bench: usize,
+
     /// Enables visualization mode
     #[arg(long = "visualize", default_value_t = false)]
     visualize: bool,
@@ -194,7 +198,11 @@ fn main() {
         })
     } else {
         let scene = create_scene(0);
-        let image = generate_image(&scene, cli.width, cli.height, |_m| {}, cli.parallel);
+        let image = (0..cli.bench.max(1))
+            .map(|_| generate_image(&scene, cli.width, cli.height, |_m| {}, cli.parallel))
+            .last()
+            .unwrap();
+        
         let output_path = cli.output.unwrap_or(PathBuf::from("output.png"));
 
         image.save(output_path).expect("Failed to save image");

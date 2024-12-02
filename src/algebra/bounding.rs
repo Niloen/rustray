@@ -53,8 +53,8 @@ impl BoundingBox {
         self.min <= other.min && self.max >= other.max
     }
 
-    /// Checks if the bounding box intersects a ray.
-    pub fn intersects_ray(&self, ray: &Ray) -> bool {
+    /// Checks if the bounding box intersects a ray within max distance
+    pub fn intersects_ray(&self, ray: &Ray, max: Distance) -> bool {
         let mut t_near = Distance::NEG_INFINITY;
         let mut t_far = Distance::INFINITY;
 
@@ -76,7 +76,7 @@ impl BoundingBox {
         }
 
         // Ensure the intersection is in the positive ray direction
-        t_far >= 0.0
+        t_far >= 0.0 && t_far <= max
     }
 
     /// Computes the center point of the bounding box.
