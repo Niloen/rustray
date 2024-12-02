@@ -76,7 +76,7 @@ impl BoundingBox {
         }
 
         // Ensure the intersection is in the positive ray direction
-        t_far >= 0.0 && t_far <= max
+        t_far >= 0.0 && t_near <= max
     }
 
     /// Computes the center point of the bounding box.
