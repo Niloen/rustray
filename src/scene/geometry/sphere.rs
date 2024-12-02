@@ -57,15 +57,13 @@ impl Geometry for Sphere {
         }
     }
 
-    fn hit(&self, ray: &Ray) -> Option<HitResult> {
-        return self.distance(ray).map(|t0| {
-            let position = ray.at(t0);
-            HitResult {
-                position,
-                normal: UnitVector3::new_normalize(position.coords),
-                coords: self.texture_coords(&position)
-            }
-        })
+    fn hit(&self, ray: &Ray, distance: Distance) -> HitResult {
+        let position = ray.at(distance);
+        HitResult {
+            position,
+            normal: UnitVector3::new_normalize(position.coords),
+            coords: self.texture_coords(&position)
+        }
     }
 }
 

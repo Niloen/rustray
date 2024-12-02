@@ -100,12 +100,13 @@ impl Geometry for Object {
     /// Finds the intersection with the object in world space.
 
     /// Computes the detailed hit result in world space.
-    fn hit(&self, ray: &Ray) -> Option<HitResult> {
+    fn hit(&self, ray: &Ray, distance: Distance) -> HitResult {
         let local_ray = self.transform.to_local_ray(ray);
-        self.geometry.hit(&local_ray).map(|hr| HitResult {
+        let hr = self.geometry.hit(&local_ray, self.transform.to_local_distance(&ray, distance));
+        HitResult {
             position: self.transform.apply_to_point(&hr.position),
             normal: UnitVector3::new_normalize(self.transform.apply_to_vector(&hr.normal)),
                 ..hr
-        })
+        }
     }
 }

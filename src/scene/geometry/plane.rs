@@ -49,17 +49,15 @@ impl Geometry for Plane {
         Some(t)
     }
 
-    fn hit(&self, ray: &Ray) -> Option<HitResult> {
-        self.distance(ray).map(|distance| {
-            // Calculate the hit position directly
-            let position = ray.at(distance);
+    fn hit(&self, ray: &Ray, distance: Distance) -> HitResult {
+        // Calculate the hit position directly
+        let position = ray.at(distance);
 
-            HitResult {
-                position,
-                normal: Plane::NORMAL, // Always (0, 1, 0)
-                coords: self.uv_coordinates(&position), // Texture coordinates
-            }
-        })
+        HitResult {
+            position,
+            normal: Plane::NORMAL, // Always (0, 1, 0)
+            coords: self.uv_coordinates(&position), // Texture coordinates
+        }
     }
 
 }

@@ -69,12 +69,11 @@ impl RayCaster for World {
 
         let intersection = self.cast_intersection(ray);
         intersection
-            .and_then(|i| {
-                i.object.hit(ray).map(|hr| {
-                    let surface = i.object.surface_at(&hr);
+            .map(|i| {
+                let hr = i.object.hit(ray, i.distance);
+                let surface = i.object.surface_at(&hr);
 
-                    surface.material.shade(ray, &hr, surface.color, self, depth)
-                })
+                surface.material.shade(ray, &hr, surface.color, self, depth)
             })
             .unwrap_or(Rgb([0.0, 0.0, 0.0]))
     }

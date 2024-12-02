@@ -59,15 +59,12 @@ impl Geometry for Cube {
         if t_min <= 0.0 { None } else { Some(t_min) }
     }
 
-    fn hit(&self, ray: &Ray) -> Option<HitResult> {
-        self.distance(ray).map(|distance| {
-            let hit_position = ray.at(distance);
-            HitResult {
-                position: hit_position,
-                normal: self.normal_at(&hit_position),
-                coords: (0.0, 0.0)
-            }
-        })
+    fn hit(&self, ray: &Ray, distance: Distance) -> HitResult {
+        HitResult {
+            position: ray.at(distance),
+            normal: self.normal_at(&ray.at(distance)),
+            coords: (0.0, 0.0)
+        }
     }
 }
 

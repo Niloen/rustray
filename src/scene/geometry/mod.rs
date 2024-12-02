@@ -21,5 +21,5 @@ pub trait Geometry: Send + Sync + Bounded {
     
     fn distance(&self, ray: &Ray) -> Option<Distance>;
 
-    fn hit(&self, ray: &Ray) -> Option<HitResult>;
+    fn hit(&self, ray: &Ray, distance: Distance) -> HitResult;
 }

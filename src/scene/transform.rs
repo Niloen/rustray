@@ -48,6 +48,10 @@ impl Transform {
         distance / self.inverse_matrix.scale_back_along(&ray.direction)
     }
 
+    pub fn to_local_distance(&self, ray: &Ray, distance: Distance) -> Distance {
+        distance * self.inverse_matrix.scale_back_along(&ray.direction)
+    }
+
     fn rotation_matrix(rotation: Vector3) -> Matrix4 {
         let angle = rotation.magnitude();
         if angle.abs() < 1e-6 {
