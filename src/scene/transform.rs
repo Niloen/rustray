@@ -103,7 +103,7 @@ mod tests {
         let local_ray = t.to_local_ray(&ray);
         
         assert_eq!(local_ray.origin, Point3::new(-2.5, -2.0, -2.0));
-        assert_eq!(local_ray.direction, Vector3::new(0.3333333333333333, 0.6666666666666666, 0.6666666666666666));
+        assert_eq!(local_ray.direction.into_inner(), Vector3::new(0.3333333333333333, 0.6666666666666666, 0.6666666666666666));
         
         assert_eq!(t.to_world_distance(&ray, 1.0), 1.1547005383792512);
     }

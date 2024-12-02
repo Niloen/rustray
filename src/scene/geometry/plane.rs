@@ -1,4 +1,4 @@
-use crate::algebra::{Distance, Ray};
+use crate::algebra::{Distance, Ray, UnitVector3};
 use crate::algebra::{Bounded, BoundingBox, Point3, Vector3};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
 
@@ -6,7 +6,7 @@ pub struct Plane {
 }
 
 impl Plane {
-    pub(crate) const NORMAL: Vector3 = Vector3::new(0.0, 1.0, 0.0);
+    pub(crate) const NORMAL: UnitVector3 = UnitVector3::new_unchecked(Vector3::new(0.0, 1.0, 0.0));
 
     pub fn new() -> Self {
         Self {

@@ -1,5 +1,5 @@
 use image::{Pixel, Rgb};
-use crate::algebra::{Distance, Point3, Vector3, VectorOps};
+use crate::algebra::{Distance, Point3, UnitVector3, Vector3, VectorOps};
 use crate::algebra::Ray;
 use crate::scene::{Color, ColorPart};
 
@@ -31,7 +31,7 @@ impl Light {
         return self.towards_direction(position).magnitude()
     }
     
-    pub fn illuminate(&self, position: Point3, normal: Vector3) -> Color {
+    pub fn illuminate(&self, position: Point3, normal: UnitVector3) -> Color {
         let direction_to_light = self.towards_direction(position);
         let fraction = direction_to_light.cos_angle(&normal) as ColorPart;
         

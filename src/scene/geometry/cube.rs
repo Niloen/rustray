@@ -1,4 +1,4 @@
-use crate::algebra::{Bounded, BoundingBox, Distance, Point3, Vector3};
+use crate::algebra::{Bounded, BoundingBox, Distance, Point3, UnitVector3, Vector3};
 use crate::scene::geometry::{Geometry, HitResult};
 use crate::algebra::Ray;
 
@@ -17,14 +17,14 @@ impl Cube {
     const MIN_BOUND: Vector3 = Vector3::new(-0.5, -0.5, -0.5);
     const MAX_BOUND: Vector3 = Vector3::new(0.5, 0.5, 0.5);
     // Compute the normal based on the intersection point
-    fn normal_at(&self, hit_position: &Point3) -> Vector3 {
+    fn normal_at(&self, hit_position: &Point3) -> UnitVector3 {
         let abs_pos = hit_position.coords.map(|c| c.abs());
         let max_axis = abs_pos.imax(); // Find the dominant axis
 
         match max_axis {
-            0 => Vector3::new(hit_position.x.signum(), 0.0, 0.0), // X-axis
-            1 => Vector3::new(0.0, hit_position.y.signum(), 0.0), // Y-axis
-            _ => Vector3::new(0.0, 0.0, hit_position.z.signum()), // Z-axis
+            0 => UnitVector3::new_unchecked(Vector3::new(hit_position.x.signum(), 0.0, 0.0)), // X-axis
+            1 => UnitVector3::new_unchecked(Vector3::new(0.0, hit_position.y.signum(), 0.0)), // Y-axis
+            _ => UnitVector3::new_unchecked(Vector3::new(0.0, 0.0, hit_position.z.signum())), // Z-axis
         }
     }
 }

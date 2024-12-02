@@ -5,7 +5,7 @@ mod frame;
 pub use frame::Frame;
 pub use ray::Ray;
 pub use bounding::{BoundingBox, Bounded};
-use nalgebra::Vector3 as NVector3;
+use nalgebra::{Unit, Vector3 as NVector3};
 use nalgebra::Matrix4 as NMatrix4;
 use nalgebra::Point3 as NPoint3;
 
@@ -13,6 +13,8 @@ pub type Distance = f64;
 pub type Vector3 = NVector3<Distance>;
 pub type Matrix4 = NMatrix4<Distance>;
 pub type Point3 = NPoint3<Distance>;
+
+pub type UnitVector3 = Unit<NVector3<Distance>>;
 
 pub trait DistanceConstants<T> {
     const PI: T;

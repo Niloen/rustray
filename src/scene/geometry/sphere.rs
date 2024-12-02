@@ -1,4 +1,4 @@
-use crate::algebra::{Distance, DistanceConstants, Ray};
+use crate::algebra::{Distance, DistanceConstants, Ray, UnitVector3};
 use crate::algebra::{Bounded, BoundingBox, Point3};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
 use std::ops::Neg;
@@ -60,10 +60,9 @@ impl Geometry for Sphere {
     fn hit(&self, ray: &Ray) -> Option<HitResult> {
         return self.distance(ray).map(|t0| {
             let position = ray.at(t0);
-            let normal = position.coords.normalize();
             HitResult {
                 position,
-                normal,
+                normal: UnitVector3::new_normalize(position.coords),
                 coords: self.texture_coords(&position)
             }
         })

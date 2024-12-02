@@ -1,4 +1,4 @@
-use crate::algebra::{Bounded, BoundingBox, Distance, Point3, Vector3};
+use crate::algebra::{Bounded, BoundingBox, Distance, Point3, UnitVector3, Vector3};
 use crate::scene::geometry::{Cube, HitResult, Plane, Sphere};
 use crate::algebra::Ray;
 use crate::scene::texture::Texture;
@@ -39,7 +39,7 @@ impl Object {
     pub fn plane(point: Point3, normal: Vector3, texture: &dyn Texture) -> Self {
         Object::new(
             Plane::new(),
-            Transform::new(Vector3::new(point.x, point.y, point.z), Transform::rotation_to(Plane::NORMAL, normal), Vector3::new(1.0, 1.0, 1.0)),
+            Transform::new(Vector3::new(point.x, point.y, point.z), Transform::rotation_to(Plane::NORMAL.into_inner(), normal), Vector3::new(1.0, 1.0, 1.0)),
             texture
         )
     }
@@ -104,7 +104,7 @@ impl Geometry for Object {
         let local_ray = self.transform.to_local_ray(ray);
         self.geometry.hit(&local_ray).map(|hr| HitResult {
             position: self.transform.apply_to_point(&hr.position),
-            normal: self.transform.apply_to_vector(&hr.normal).normalize(),
+            normal: UnitVector3::new_normalize(self.transform.apply_to_vector(&hr.normal)),
                 ..hr
         })
     }

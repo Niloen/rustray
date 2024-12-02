@@ -1,8 +1,8 @@
-use crate::algebra::{Bounded, Distance, Point3, Vector3};
 use crate::algebra::Ray;
-pub use sphere::Sphere;
+use crate::algebra::{Bounded, Distance, Point3, UnitVector3};
 pub use cube::Cube;
 pub use plane::Plane;
+pub use sphere::Sphere;
 
 mod sphere;
 mod cube;
@@ -13,7 +13,7 @@ pub type TextureCoords = (Distance, Distance);
 #[derive(Debug)]
 pub struct HitResult {
     pub position: Point3,
-    pub normal: Vector3,
+    pub normal: UnitVector3,
     pub coords: TextureCoords
 }
 
