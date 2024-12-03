@@ -6,7 +6,6 @@ pub struct Frame {
     pub y_axis: Vector3, // Represents the second column (basis vector Y)
     pub z_axis: Vector3, // Represents the third column (basis vector Z)
     pub origin: Point3,  // Translation (position in space)
-    pub scale: Vector3 // Scales of x,y,z
 }
 
 impl Frame {
@@ -58,27 +57,11 @@ impl Frame {
             y_axis,
             z_axis,
             origin,
-            scale: Vector3::new(x_axis.magnitude(), y_axis.magnitude(), z_axis.magnitude()),
         }
     }
 }
 
 impl Frame {
-    /// Computes the effective scaling fcameactor for the given vector.
-    /// This adjusts for non-uniform scaling when transforming distances back to world space.
-    ///
-    /// It is assumed that the vector v is normalized
-    pub fn scale_back_along(&self, v: &Vector3) -> f64 {
-        // Compute scaled vector components
-        let scaled = Vector3::new(
-            v.x * self.scale.x,
-            v.y * self.scale.y,
-            v.z * self.scale.z,
-        );
-
-        // Return the magnitude of the scaled vector
-        scaled.magnitude()
-    }
     /// Transforms a point to world space.
     #[inline(never)]
     pub fn transform_point(&self, point: &Point3) -> Point3 {

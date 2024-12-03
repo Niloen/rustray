@@ -1,4 +1,4 @@
-use crate::algebra::{Distance, DistanceConstants, Ray, UnitVector3};
+use crate::algebra::{Distance, DistanceConstants, Ray};
 use crate::algebra::{Frame, Matrix4, Point3, Vector3};
 use nalgebra::Unit;
 
@@ -42,21 +42,6 @@ impl Transform {
             self.inverse_matrix.transform_point(&ray.origin),
             self.inverse_matrix.transform_vector(&ray.direction),
         )
-    }
-
-    pub fn to_local_ray_unnormalized(&self, ray: &Ray) -> Ray {
-        Ray::from_normalized(
-            self.inverse_matrix.transform_point(&ray.origin),
-            UnitVector3::new_unchecked(self.inverse_matrix.transform_vector(&ray.direction)),
-        )
-    }
-
-    pub fn to_world_distance(&self, ray: &Ray, distance: Distance) -> Distance {
-        distance / self.inverse_matrix.scale_back_along(&ray.direction)
-    }
-
-    pub fn to_local_distance(&self, ray: &Ray, distance: Distance) -> Distance {
-        distance * self.inverse_matrix.scale_back_along(&ray.direction)
     }
 
     fn rotation_matrix(rotation: Vector3) -> Matrix4 {
@@ -110,13 +95,10 @@ mod tests {
     fn test_to_local() {
         let t = Transform::new(Vector3::new(5.0, 2.0, 2.0), Vector3::zeros(), Vector3::new(2.0, 1.0, 1.0));
 
-        let ray = Ray::new(Point3::origin(), Vector3::new(1.0, 1.0, 1.0));
+        let ray = Ray::normalized(Point3::origin(), Vector3::new(1.0, 1.0, 1.0));
         let local_ray = t.to_local_ray(&ray);
         
         assert_eq!(local_ray.origin, Point3::new(-2.5, -2.0, -2.0));
-        assert_eq!(local_ray.direction.into_inner(), Vector3::new(0.3333333333333333, 0.6666666666666666, 0.6666666666666666));
-        
-        assert_eq!(t.to_world_distance(&ray, 1.0), 1.1547005383792512);
+        assert_eq!(local_ray.direction, Vector3::new(0.2886751345948129, 0.5773502691896258, 0.5773502691896258));
     }
-    
 }

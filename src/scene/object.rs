@@ -89,7 +89,7 @@ impl Bounded for Object {
 
 impl Geometry for Object {
     fn distance(&self, ray: &Ray) -> Option<Distance> {
-        let local_ray = self.transform.to_local_ray_unnormalized(ray);
+        let local_ray = self.transform.to_local_ray(ray);
 
         // Check for intersection in local space
         self.geometry.distance(&local_ray)
@@ -100,7 +100,7 @@ impl Geometry for Object {
     /// Computes the detailed hit result in world space.
     fn hit(&self, ray: &Ray, distance: Distance) -> HitResult {
         let local_ray = self.transform.to_local_ray(ray);
-        let hr = self.geometry.hit(&local_ray, self.transform.to_local_distance(&ray, distance));
+        let hr = self.geometry.hit(&local_ray, distance);
         HitResult {
             position: self.transform.apply_to_point(&hr.position),
             normal: UnitVector3::new_normalize(self.transform.apply_to_vector(&hr.normal)),

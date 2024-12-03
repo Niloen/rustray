@@ -20,7 +20,7 @@ impl Light {
     }
     
     pub fn towards(&self, position: Point3) -> Ray {
-        Ray::new(position, self.towards_direction(position))
+        Ray::normalized(position, self.towards_direction(position))
     }
     
     pub fn towards_direction(&self, position: Point3) -> Vector3 {

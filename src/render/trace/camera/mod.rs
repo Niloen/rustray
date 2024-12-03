@@ -59,7 +59,7 @@ impl Camera {
             + self.pixel_step_x * x as Distance
             + self.pixel_step_y * y as Distance;
 
-        Ray::new(self.base.origin, world_direction)
+        Ray::normalized(self.base.origin, world_direction)
     }
 
     fn trace_pixel(&self, caster: &impl RayCaster, x: u32, y: u32) -> Rgb<u8> {

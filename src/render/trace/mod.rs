@@ -27,7 +27,7 @@ impl TraceRenderer {
 impl Renderer for TraceRenderer {
     fn render(&self, scene: &Scene, width: u32, height: u32, tx: impl RenderListener) -> RgbImage {
         let world = World::from_scene(scene);
-        let camera_base = Ray::new(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.1, 1.0).normalize());
+        let camera_base = Ray::normalized(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.1, 1.0).normalize());
         let camera = Camera::new(camera_base, width, height, 50.0);
 
         let photo_start_time = Instant::now();

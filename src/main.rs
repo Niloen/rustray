@@ -77,8 +77,8 @@ fn create_scene(frame: u32) -> Scene {
 fn create_scene1(_frame: u32) -> Scene {
     const MAT: BaseMaterial = BaseMaterial::DEFAULT;
     let mut scene = Scene::new();
-    scene.add_light(Light::new(Ray::new(Point3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([1.0, 1.0, 1.0])));
-    scene.add_light(Light::new(Ray::new(Point3::new(-100.0, 0.0, 80.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([0.0, 0.0, 1.0])));
+    scene.add_light(Light::new(Ray::normalized(Point3::new(0.0, 100.0, 100.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([1.0, 1.0, 1.0])));
+    scene.add_light(Light::new(Ray::normalized(Point3::new(-100.0, 0.0, 80.0), Vector3::new(0.0, -1.0, 0.0)), Rgb([0.0, 0.0, 1.0])));
     scene.add(Object::sphere(Point3::new(0.0, 25.0, 100.0), 20.0, &Surface::new(Rgb([1.0, 1.0, 1.0]), &MAT)));
     for i in 1..=1000 {
         let ifl = i as Distance;
@@ -109,8 +109,8 @@ fn create_scene2(frame: u32) -> Scene {
 
     let z = 200.0;
 
-    scene.add_light(Light::new(Ray::new(Point3::new(0.0, 100.0, z), Vector3::new(0.0, -1.0, 0.0)), white));
-    scene.add_light(Light::new(Ray::new(Point3::new(-10.0, -25.0, z), Vector3::new(0.0, 0.0, -1.0)), Rgb([0.2, 0.2, 0.2])));
+    scene.add_light(Light::new(Ray::normalized(Point3::new(0.0, 100.0, z), Vector3::new(0.0, -1.0, 0.0)), white));
+    scene.add_light(Light::new(Ray::normalized(Point3::new(-10.0, -25.0, z), Vector3::new(0.0, 0.0, -1.0)), Rgb([0.2, 0.2, 0.2])));
 
     let checkerboard_texture1 = CheckerboardTexture::new(Surface::new(white, &mat), Surface::new(green, &mat), 0.01);
     let checkerboard_texture2 = CheckerboardTexture::new(Surface::new(white, &mat), Surface::new(blue, &mat), 0.01);
@@ -142,7 +142,7 @@ fn create_scene3(_frame: u32) -> Scene {
 
     let mut scene = Scene::new();
 
-    scene.add_light(Light::new(Ray::new(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -1.0)), white));
+    scene.add_light(Light::new(Ray::normalized(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -1.0)), white));
     scene.add(Object::plane(Point3::new(0.0, -100.0, 0.0), Vector3::new(0.0, 1.0, 0.0), &Surface::new(green, &mat)));
     scene.add(Object::sphere(Point3::new(20.0, 20.0, 100.0), 20.0, &Surface::new(white, &mat)));
     scene
@@ -171,7 +171,7 @@ fn create_scene4<'a>(_frame: u32) -> Scene {
 
     let mut scene = Scene::new();
 
-    scene.add_light(Light::new(Ray::new(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -1.0)), white));
+    scene.add_light(Light::new(Ray::normalized(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -1.0)), white));
     scene.add(Object::plane(Point3::new(0.0, -40.0, z + 200.0), Vector3::new(0.0, 1.0, 0.0), &checkerboard_texture1));
     scene.add(Object::sphere(Point3::new(100.0, 100.0, z), 60.0, &Surface::new(blue, &mat)));
     scene

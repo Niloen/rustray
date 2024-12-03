@@ -27,7 +27,7 @@ impl Material for BaseMaterial {
             if color == BaseMaterial::BLACK {
                 color
             } else {
-                caster.direct_lightning(&Ray::from_normalized(hit.position, hit.normal))
+                caster.direct_lightning(&Ray::new(hit.position, hit.normal.into_inner()))
                     .map(|c| c * (1.0 - self.reflectivity))
                     .map2(&color, |c1, c2|c1 * c2)
             }
@@ -71,7 +71,7 @@ impl BaseMaterial {
     fn reflected_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Color {
         let reflected_direction = ray.reflect(hit.normal.into_inner()).direction;
         // Adjust along normal to avoid self-intersection
-        let reflected_ray = Ray::from_normalized(hit.position + hit.normal.into_inner() * 0.000001, reflected_direction);
+        let reflected_ray = Ray::new(hit.position + hit.normal.into_inner() * 0.000001, reflected_direction);
         let reflected_color = caster.cast(&reflected_ray, depth - 1);
         reflected_color
     }
@@ -97,8 +97,8 @@ impl BaseMaterial {
         }
 
         let cos_t = (1.0 - sin_t2).sqrt();
-        let refracted_direction = ray.direction.into_inner() * eta as Distance + normal.into_inner() * (eta * cos_i - cos_t);
-        let refracted_ray = Ray::new(hit.position - hit.normal.into_inner() * 0.000001, refracted_direction);
+        let refracted_direction = ray.direction * eta as Distance + normal.into_inner() * (eta * cos_i - cos_t);
+        let refracted_ray = Ray::normalized(hit.position - hit.normal.into_inner() * 0.000001, refracted_direction);
         caster.cast(&refracted_ray, depth - 1)
     }
 }

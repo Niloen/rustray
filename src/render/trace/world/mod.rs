@@ -1,4 +1,4 @@
-use crate::algebra::{Distance, Point3};
+use crate::algebra::{Distance, Point3, UnitVector3};
 use crate::algebra::Ray;
 use crate::render::trace::world::intersect::Intersection;
 use crate::render::trace::world::otree::{Octree, OctreeConfig};
@@ -82,7 +82,7 @@ impl RayCaster for World {
         let mut c = Color::from([0.0 as ColorPart, 0.0, 0.0]);
 
         for l in self.lights.iter() {
-            let color = l.illuminate(normal_ray.origin, normal_ray.direction);
+            let color = l.illuminate(normal_ray.origin, UnitVector3::new_normalize(normal_ray.direction));
             if color != World::BLACK {
                 if !self.is_shadowed(normal_ray.at(0.0001), l) {
                     c = c.map2(&color, |x1, x2| min(1.0, x1 + x2))
