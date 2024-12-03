@@ -27,7 +27,7 @@ impl Material for BaseMaterial {
             if color == BaseMaterial::BLACK {
                 color
             } else {
-                caster.direct_lightning(&Ray::new(hit.position, hit.normal.into_inner()))
+                caster.direct_lightning(&hit.position, &hit.normal)
                     .map(|c| c * (1.0 - self.reflectivity))
                     .map2(&color, |c1, c2|c1 * c2)
             }

@@ -78,13 +78,14 @@ impl RayCaster for World {
             .unwrap_or(Rgb([0.0, 0.0, 0.0]))
     }
 
-    fn direct_lightning(&self, normal_ray: &Ray) -> Color {
+    fn direct_lightning(&self, position: &Point3, normal: &UnitVector3) -> Color {
         let mut c = Color::from([0.0 as ColorPart, 0.0, 0.0]);
 
         for l in self.lights.iter() {
-            let color = l.illuminate(normal_ray.origin, UnitVector3::new_normalize(normal_ray.direction));
+            let color = l.illuminate(*position, *normal);
             if color != World::BLACK {
-                if !self.is_shadowed(normal_ray.at(0.0001), l) {
+                let ray = Ray::new(*position, normal.into_inner());
+                if !self.is_shadowed(ray.at(0.0001), l) {
                     c = c.map2(&color, |x1, x2| min(1.0, x1 + x2))
                 }
             }
