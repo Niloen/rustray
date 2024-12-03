@@ -89,12 +89,10 @@ impl Bounded for Object {
 
 impl Geometry for Object {
     fn distance(&self, ray: &Ray) -> Option<Distance> {
-        let local_ray = self.transform.to_local_ray(ray);
+        let local_ray = self.transform.to_local_ray_unnormalized(ray);
 
         // Check for intersection in local space
-        self.geometry.distance(&local_ray).map(|distance| {
-            self.transform.to_world_distance(&ray, distance)
-        })
+        self.geometry.distance(&local_ray)
     }
 
     /// Finds the intersection with the object in world space.

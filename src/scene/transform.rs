@@ -1,4 +1,4 @@
-use crate::algebra::{Distance, DistanceConstants, Ray};
+use crate::algebra::{Distance, DistanceConstants, Ray, UnitVector3};
 use crate::algebra::{Frame, Matrix4, Point3, Vector3};
 use nalgebra::Unit;
 
@@ -41,6 +41,13 @@ impl Transform {
         Ray::new(
             self.inverse_matrix.transform_point(&ray.origin),
             self.inverse_matrix.transform_vector(&ray.direction),
+        )
+    }
+
+    pub fn to_local_ray_unnormalized(&self, ray: &Ray) -> Ray {
+        Ray::from_normalized(
+            self.inverse_matrix.transform_point(&ray.origin),
+            UnitVector3::new_unchecked(self.inverse_matrix.transform_vector(&ray.direction)),
         )
     }
 

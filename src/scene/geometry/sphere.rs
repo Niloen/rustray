@@ -29,19 +29,21 @@ impl Geometry for Sphere {
         // Vector from ray origin to sphere center (center is always (0,0,0))
         let origin_to_center = ray.origin.coords;
 
-        // Projection of origin_to_center onto the ray direction
-        let tca = origin_to_center.neg().dot(&ray.direction);
+        let direction_length_squared = ray.direction.magnitude_squared();
+        
+        // Projection of origin_to_center onto the ray direction, in ray units
+        let tca = origin_to_center.neg().dot(&ray.direction) / direction_length_squared;
 
-        // Squared distance from sphere center to the ray
-        let d2 = origin_to_center.magnitude_squared() - tca * tca;
+        // Squared distance from sphere center to the ray, in local units
+        let d2 = origin_to_center.magnitude_squared() - tca * tca * direction_length_squared;
 
         // If d^2 > 1, the ray misses the sphere
         if d2 > 1.0 {
             return None;
         }
 
-        // Distance from the ray to the sphere's intersection points
-        let thc = (1.0 - d2).sqrt();
+        // Distance from the ray to the sphere's intersection points, in ray units
+        let thc = ((1.0 - d2) / direction_length_squared).sqrt();
 
         // Compute the near and far intersection distances
         let t0 = tca - thc;
