@@ -29,10 +29,9 @@ fn min(v1: ColorPart, v2: ColorPart) -> ColorPart {
 }
 
 impl World {
-    const USE_OTREE: bool = true;
     pub fn new(objects: Vec<Arc<dyn Intersecting>>) -> World {
         World {
-            root: if World::USE_OTREE {
+            root: if objects.len() > 20 {
                 Box::new(Octree::new(OctreeConfig::new(8, 5, 1.5), objects))
             } else {
                 Box::new(objects)
