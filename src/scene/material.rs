@@ -1,5 +1,5 @@
 use crate::scene::geometry::HitResult;
-use crate::algebra::{Distance, Ray};
+use crate::algebra::{Distance, DistanceConstants, Ray};
 use crate::scene::ray::RayCaster;
 use image::{Pixel, Rgb};
 use std::fmt::Debug;
@@ -71,7 +71,7 @@ impl BaseMaterial {
     fn reflected_color(ray: &Ray, hit: &HitResult, caster: &dyn RayCaster, depth: u32) -> Color {
         let reflected_direction = ray.reflect(hit.normal.into_inner()).direction;
         // Adjust along normal to avoid self-intersection
-        let reflected_ray = Ray::new(hit.position + hit.normal.into_inner() * 0.000001, reflected_direction);
+        let reflected_ray = Ray::new(hit.position + hit.normal.into_inner() * Distance::OFF_SURFACE, reflected_direction);
         let reflected_color = caster.cast(&reflected_ray, depth - 1);
         reflected_color
     }
@@ -98,7 +98,7 @@ impl BaseMaterial {
 
         let cos_t = (1.0 - sin_t2).sqrt();
         let refracted_direction = ray.direction * eta as Distance + normal.into_inner() * (eta * cos_i - cos_t);
-        let refracted_ray = Ray::normalized(hit.position - hit.normal.into_inner() * 0.000001, refracted_direction);
+        let refracted_ray = Ray::normalized(hit.position - hit.normal.into_inner() * Distance::OFF_SURFACE, refracted_direction);
         caster.cast(&refracted_ray, depth - 1)
     }
 }

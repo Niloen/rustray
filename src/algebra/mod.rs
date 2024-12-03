@@ -18,13 +18,19 @@ pub type UnitVector3 = Unit<NVector3<Distance>>;
 
 pub trait DistanceConstants<T> {
     const PI: T;
+    
+    const OFF_SURFACE: Distance; // Used to move off surfaces 
 }
 impl DistanceConstants<f32> for f32 {
     const PI: f32 = std::f32::consts::PI;
+
+    const OFF_SURFACE: Distance = 0.001;
 }
 
 impl DistanceConstants<f64> for f64 {
     const PI: f64 = std::f64::consts::PI;
+
+    const OFF_SURFACE: Distance = 0.00001;
 }
 
 pub trait VectorOps {
