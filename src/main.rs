@@ -49,7 +49,7 @@ struct Cli {
     video_frames: u32,
 
     /// Buffer size for video frames
-    #[arg(short, long, default_value_t = 1, requires = "video")]
+    #[arg(short, long, default_value_t = 8, requires = "video")]
     video_buffer: u32,
 
 
@@ -184,7 +184,7 @@ fn main() {
     if cli.visualize {
         show(cli.width as i32, cli.height as i32, move |tx| {
             if cli.video {
-                let btx = BufferedChannel::new(min(cli.video_frames as usize, cli.video_buffer as usize), move |m|tx.send_blocking(m).unwrap());
+                let btx = BufferedChannel::new(min(cli.video_frames as usize, cli.video_buffer as usize), 4.0, move |m|tx.send_blocking(m).unwrap());
                 for i in 0..cli.video_frames {
                     let scene = create_scene(i);
                     let image = generate_image(&scene, cli.width, cli.height, |_m| {}, cli.parallel);
