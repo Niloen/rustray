@@ -1,7 +1,6 @@
 use crate::algebra::{Distance, DistanceConstants, Ray, UnitVector3};
 use crate::algebra::{Bounded, BoundingBox, Point3};
 use crate::scene::geometry::{Geometry, HitResult, TextureCoords};
-use std::ops::Neg;
 
 impl Sphere {
     pub fn new() -> Sphere {
@@ -26,30 +25,38 @@ impl Bounded for Sphere {
 
 impl Geometry for Sphere {
     fn distance(&self, ray: &Ray) -> Option<Distance> {
-        // Vector from ray origin to sphere center (center is always (0,0,0))
-        let origin_to_center = ray.origin.coords;
-
-        let direction_length_squared = ray.direction.magnitude_squared();
+        // All vector operations inlined for performance, it actually performs better even though 
+        // rust is inlining the dot function
         
-        // Projection of origin_to_center onto the ray direction, in ray units
-        let tca = origin_to_center.neg().dot(&ray.direction) / direction_length_squared;
+        let origin_to_center_x = ray.origin.x;
+        let origin_to_center_y = ray.origin.y;
+        let origin_to_center_z = ray.origin.z;
 
-        // Squared distance from sphere center to the ray, in local units
-        let d2 = origin_to_center.magnitude_squared() - tca * tca * direction_length_squared;
+        let direction_x = ray.direction.x;
+        let direction_y = ray.direction.y;
+        let direction_z = ray.direction.z;
 
-        // If d^2 > 1, the ray misses the sphere
+        let direction_length_squared =
+            direction_x * direction_x + direction_y * direction_y + direction_z * direction_z;
+
+        let tca = -(origin_to_center_x * direction_x
+            + origin_to_center_y * direction_y
+            + origin_to_center_z * direction_z)
+            / direction_length_squared;
+
+        let d2 = origin_to_center_x * origin_to_center_x
+            + origin_to_center_y * origin_to_center_y
+            + origin_to_center_z * origin_to_center_z
+            - tca * tca * direction_length_squared;
+
         if d2 > 1.0 {
-            return None;
+            return None
         }
 
-        // Distance from the ray to the sphere's intersection points, in ray units
         let thc = ((1.0 - d2) / direction_length_squared).sqrt();
-
-        // Compute the near and far intersection distances
         let t0 = tca - thc;
         let t1 = tca + thc;
 
-        // Choose the closest positive intersection
         if t0 > 0.0 {
             Some(t0)
         } else if t1 > 0.0 {
@@ -64,10 +71,23 @@ impl Geometry for Sphere {
         HitResult {
             position,
             normal: UnitVector3::new_normalize(position.coords),
-            coords: self.texture_coords(&position)
+            coords: self.texture_coords(&position),
         }
     }
 }
 
-pub struct Sphere {
+pub struct Sphere {}
+
+#[cfg(test)]
+mod tests {
+    use crate::algebra::Vector3;
+    use super::*;
+
+    #[test]
+    fn distance() {
+        let sphere = Sphere::new();
+        let ray = Ray::new(Point3::new(0.0, 0.0, -10.0), Vector3::new(0.0, 0.0, 2.0));
+        let distance = sphere.distance(&ray).unwrap();
+        assert_eq!(4.5, distance);
+    }
 }
