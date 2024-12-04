@@ -98,7 +98,7 @@ impl World {
     const BLACK: Color = Rgb([0.0, 0.0, 0.0]);
 
     fn is_shadowed(&self, position: Point3, light: &Light) -> bool {
-        self.is_something_within_distance(&light.towards(position), light.distance_to(position))
+        self.is_something_within_distance(&light.towards(position), 1.0)
     }
 
     fn is_something_within_distance(&self, ray: &Ray, distance: Distance) -> bool {

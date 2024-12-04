@@ -1,7 +1,7 @@
-use image::{Pixel, Rgb};
-use crate::algebra::{Distance, Point3, UnitVector3, Vector3, VectorOps};
 use crate::algebra::Ray;
+use crate::algebra::{Point3, UnitVector3, Vector3, VectorOps};
 use crate::scene::{Color, ColorPart};
+use image::{Pixel, Rgb};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Light {
@@ -20,15 +20,11 @@ impl Light {
     }
     
     pub fn towards(&self, position: Point3) -> Ray {
-        Ray::normalized(position, self.towards_direction(position))
+        Ray::new(position, self.towards_direction(position))
     }
-    
+
     pub fn towards_direction(&self, position: Point3) -> Vector3 {
         self.ray.origin - position
-    }
-    
-    pub fn distance_to(&self, position: Point3) -> Distance {
-        return self.towards_direction(position).magnitude()
     }
     
     pub fn illuminate(&self, position: Point3, normal: UnitVector3) -> Color {
