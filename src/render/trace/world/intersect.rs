@@ -65,7 +65,7 @@ where
     for x in iter {
         if let Some(intersection) = x.closest_intersection(ray, shortest) {
             shortest = intersection.distance;
-            result = Some(intersection);
+            result.replace(intersection);
         }
     }
     result
