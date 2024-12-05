@@ -21,9 +21,9 @@ impl Texture for CheckerboardTexture {
         let (u, v) = coords;
         let checker = ((u * self.scale).floor() + (v * self.scale).floor()) as i32;
         if checker % 2 == 0 {
-            self.surface1.clone() // Ensure Surface implements Clone or manually clone if needed
+            self.surface1
         } else {
-            self.surface2.clone()
+            self.surface2
         }
     }
 

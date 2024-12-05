@@ -4,7 +4,6 @@ use crate::render::trace::world::intersect::Intersection;
 use crate::render::trace::world::otree::{Octree, OctreeConfig};
 pub use crate::scene::geometry::Geometry;
 pub use crate::scene::light::Light;
-pub use crate::scene::material::Material;
 pub use crate::scene::ray::RayCaster;
 use crate::scene::{Color, ColorPart, Scene};
 use image::{Pixel, Rgb};

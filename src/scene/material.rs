@@ -5,26 +5,19 @@ use image::{Pixel, Rgb};
 use std::fmt::Debug;
 use crate::scene::{Color, ColorPart};
 
-pub trait Material: Send + Sync + Debug {
-    /// Calculates the color for the material at an intersection point.
-    /// Takes the ray that hit the object, the hit result, the ray caster function, and the recursion depth.
-    fn shade(&self, ray: &Ray, hit: &HitResult, color: Color, caster: &dyn RayCaster, depth: u32) -> Color;
-    fn clone_box(&self) -> Box<dyn Material>;
-}
-
-#[derive(Debug, Clone)]
-pub struct BaseMaterial {
+#[derive(Debug, Copy, Clone)]
+pub struct Material {
     pub reflectivity: ColorPart,   // 0 for diffuse, higher values for reflective
     pub emission: Color,  // Non-zero values make the material emissive
     pub refractive: Distance
 }
 
-impl Material for BaseMaterial {
-    fn shade(&self, ray: &Ray, hit: &HitResult, color: Color, caster: &dyn RayCaster, depth: u32) -> Color {
+impl Material {
+    pub fn shade(&self, ray: &Ray, hit: &HitResult, color: Color, caster: &dyn RayCaster, depth: u32) -> Color {
         // Basic shading logic with adjustable parameters
 
         let mut color = if self.reflectivity < 1.0 {
-            if color == BaseMaterial::BLACK {
+            if color == Material::BLACK {
                 color
             } else {
                 caster.direct_lightning(&hit.position, &hit.normal)
@@ -53,14 +46,10 @@ impl Material for BaseMaterial {
 
         color
     }
-
-    fn clone_box(&self) -> Box<dyn Material> {
-        Box::new(self.clone())
-    }
 }
 
-impl BaseMaterial {
-    pub const DEFAULT: BaseMaterial = BaseMaterial {
+impl Material {
+    pub const DEFAULT: Material = Material {
         emission: Rgb([0.0, 0.0, 0.0]),
         reflectivity: 0.0,
         refractive: 1.0

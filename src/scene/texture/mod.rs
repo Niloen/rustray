@@ -12,7 +12,7 @@ pub trait Texture: Send + Sync {
 
 impl Texture for Surface {
     fn surface_at(&self, _coords: TextureCoords) -> Surface {
-        self.clone()
+        *self
     }
 
     fn clone_box(&self) -> Box<dyn Texture> {
