@@ -70,3 +70,21 @@ impl Geometry for Cube {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use std::time::Instant;
+    use super::*;
+    
+    #[test]
+    #[ignore]
+    fn bench() {
+        let c = Cube::new();
+        let r = Ray::new(Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 1.0));
+        let time = Instant::now();
+        for _ in 0..10000000 {
+            c.distance(&r);
+        }
+        println!("{:?}", time.elapsed());
+    }
+}
+
